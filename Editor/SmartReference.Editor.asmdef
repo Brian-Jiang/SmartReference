@@ -1,0 +1,10 @@
+﻿{
+  "name": "SmartReference.Editor",
+  "rootNamespace": "SmartReference",
+  "includePlatforms": [
+    "Editor"
+  ],
+  "references": [
+    "GUID:2102fc48d2574f839ad3bea55a14e6b8"
+  ]
+}
