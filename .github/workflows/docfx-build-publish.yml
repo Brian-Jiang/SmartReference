@@ -1,0 +1,83 @@
+# This is a basic workflow to help you get started with Actions
+
+name: DocFX Build and Publish
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.101
+          
+      - name: Setup DocFX
+        uses: crazy-max/ghaction-chocolatey@v1
+        with:
+          args: install docfx --ignore-checksums
+          
+      - name: Setup wkhtmltopdf
+        uses: crazy-max/ghaction-chocolatey@v1
+        with:
+          args: install wkhtmltopdf --ignore-checksums
+          
+      - name: Copy readme
+        run: cp .\README.md .\Tools~\DocFx\index.md
+        shell: powershell
+        
+      - name: DocFX Build
+        working-directory: Tools~/DocFx
+        run: docfx docfx.json
+        continue-on-error: false
+    
+      - name: Upload site artifact
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: _site
+          path: Tools~/DocFx/_site
+          
+      - name: Upload PDF
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: _site_pdf
+          path: Tools~/DocFx/_site_pdf/DocFx.pdf
+        
+  deploy:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download site artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: _site
+        
+      - name: Publish
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: _site
+          force_orphan: true

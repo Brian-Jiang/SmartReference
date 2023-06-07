@@ -59,41 +59,5 @@ namespace SmartReference.Editor {
             //     EditorGUI.bo
             // }
         }
-        
-        // inner2.Array.data[0].sInner
-        // private Type GetNestedObjectType(SerializedProperty property, string propertyPath, int depth, Type fieldType) {
-        //     if (depth > 0) {
-        //         var firstPropertyPath = propertyPath[..propertyPath.IndexOf('.')];
-        //         var remainingPropertyPath = propertyPath[(propertyPath.IndexOf('.') + 1)..];
-        //         
-        //         if (firstPropertyPath == "Array") {
-        //             Regex regex = new Regex(@"data\[(\d+)\]");
-        //             Match match = regex.Match(remainingPropertyPath);
-        //             if (!match.Success) return null;
-        //             
-        //             var elementIndex = int.Parse(match.Groups[1].Value);
-        //             remainingPropertyPath = remainingPropertyPath[(remainingPropertyPath.IndexOf('.') + 1)..];
-        //             var arrayElementProperty = property.GetArrayElementAtIndex(elementIndex);
-        //             return GetNestedObjectType(arrayElementProperty, remainingPropertyPath, depth - 1);
-        //         }
-        //         
-        //         
-        //         var innerProperty = property.serializedObject.FindProperty(firstPropertyPath);
-        //         return GetNestedObjectType(innerProperty, remainingPropertyPath, depth - 1, fieldType.GetField(firstPropertyPath).FieldType);
-        //     }
-        //     
-        //     var objectArray = property.serializedObject.targetObjects;
-        //     var sType = objectArray[0].GetType();
-        //     var oType = sType.GetField(property.propertyPath).FieldType.GenericTypeArguments[0];
-        //     return oType;
-        // }
-
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-            return base.GetPropertyHeight(property, label);
-        }
-        
-        // public override VisualElement CreatePropertyGUI(SerializedProperty property) {
-        //     return base.CreatePropertyGUI(property);
-        // }
     }
 }

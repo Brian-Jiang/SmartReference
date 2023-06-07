@@ -1,0 +1,8 @@
+apiRules:
+  - include:
+      uidRegex: ^SmartReference.Runtime\.?[^.]*
+      type: Namespace
+  - exclude:
+      uidRegex: .*
+      type: Namespace
+  
