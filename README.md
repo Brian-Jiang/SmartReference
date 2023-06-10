@@ -3,7 +3,7 @@
 
 ## Summary
 Smart Reference is a Unity plugin that allows you to lazy load references to other objects in ScriptableObject and MonoBehaviour.
-People use ScriptableObject to store data, but when you reference other objects, they will be treated as dependencies and will be loaded when the ScriptableObject is loaded.
+We use ScriptableObject to store data, but when you reference other objects, they will be treated as dependencies and will be loaded when the ScriptableObject is loaded.
 This could be slow if you have a lot of references. Smart Reference allows you to load references only when you need them at runtime with same workflow in editor.
 
 ## Quick Start

@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
+// ReSharper disable NotAccessedField.Global used in serialization
 
 namespace SmartReference.Runtime {
     public delegate Object SmartReferenceLoader(string path, Type type);
@@ -14,33 +15,32 @@ namespace SmartReference.Runtime {
 
         protected static SmartReferenceLoader loader;
         protected static SmartReferenceLoaderAsync loaderAsync;
-        public static void Init(SmartReferenceLoader loader, SmartReferenceLoaderAsync loaderAsync) {
-            SmartReference.loader = loader;
-            SmartReference.loaderAsync = loaderAsync;
+        public static void Init(SmartReferenceLoader mLoader, SmartReferenceLoaderAsync mLoaderAsync) {
+            loader = mLoader;
+            loaderAsync = mLoaderAsync;
         }
     }
     
     [Serializable]
-    public class SmartReference<T>: SmartReference where T: Object {
+    public class SmartReference<T>: SmartReference, ISerializationCallbackReceiver where T: Object {
         public string type;
 
         private T value;
         public T Value {
             get {
-                if (value != null) {
-                    return value;
+                if (value == null) {
+                    Load();
                 }
 
-                Load();
                 return value;
             }
         }
 
-#if UNITY_EDITOR
-        public SmartReference() {
-            type = typeof(T).AssemblyQualifiedName;
-        }
-#endif
+// #if UNITY_EDITOR
+//         public SmartReference() {
+//             type = typeof(T).AssemblyQualifiedName;
+//         }
+// #endif
         
         public static implicit operator T(SmartReference<T> reference) {
             return reference.Value;
@@ -75,6 +75,14 @@ namespace SmartReference.Runtime {
                 
                 value = (T) obj;
             });
+        }
+
+        public void OnBeforeSerialize() {
+            type = typeof(T).AssemblyQualifiedName;
+        }
+
+        public void OnAfterDeserialize() {
+            
         }
     }
 }
