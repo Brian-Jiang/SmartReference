@@ -4,8 +4,8 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace SmartReference.Editor {
-    [CustomPropertyDrawer(typeof(SmartReference.Runtime.SmartReference), true)]
-    public class SmartReferenceEditor: PropertyDrawer {
+    [CustomPropertyDrawer(typeof(Runtime.SmartReference), true)]
+    internal class SmartReferenceEditor: PropertyDrawer {
         private SerializedProperty cacheProperty;
         private Object referencedObject;
         private SerializedProperty guidProp;
