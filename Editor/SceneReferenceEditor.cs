@@ -17,7 +17,7 @@ namespace SmartReference.Editor {
             }
             
             EditorGUI.BeginChangeCheck();
-            var newScene = EditorGUILayout.ObjectField(property.displayName, currentScene, typeof(SceneAsset), false) as SceneAsset;
+            var newScene = EditorGUI.ObjectField(position, property.displayName, currentScene, typeof(SceneAsset), false) as SceneAsset;
             if (EditorGUI.EndChangeCheck())
             {
                 currentScene = newScene;
