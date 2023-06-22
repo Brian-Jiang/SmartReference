@@ -23,9 +23,13 @@ namespace SmartReference.Runtime {
     
     [Serializable]
     public class SmartReference<T>: SmartReference, ISerializationCallbackReceiver where T: Object {
-        public string type;
+        [SerializeField]
+        private string type;
 
         private T value;
+        /// <summary>
+        /// Get the asset. If the asset is not loaded, it will be loaded automatically.
+        /// </summary>
         public T Value {
             get {
                 if (value == null) {
@@ -36,16 +40,13 @@ namespace SmartReference.Runtime {
             }
         }
 
-// #if UNITY_EDITOR
-//         public SmartReference() {
-//             type = typeof(T).AssemblyQualifiedName;
-//         }
-// #endif
-        
         public static implicit operator T(SmartReference<T> reference) {
             return reference.Value;
         }
 
+        /// <summary>
+        /// Call this method to load the asset. This would be called automatically when you access the Value property.
+        /// </summary>
         public void Load() {
             if (string.IsNullOrEmpty(path)) return;
             
@@ -60,6 +61,9 @@ namespace SmartReference.Runtime {
             }
         }
         
+        /// <summary>
+        /// Call this method to load the asset asynchronously. Useful if you want to preload the asset.
+        /// </summary>
         public void LoadAsync() {
             if (string.IsNullOrEmpty(path)) return;
             

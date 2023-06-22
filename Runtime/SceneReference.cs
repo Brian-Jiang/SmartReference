@@ -6,6 +6,10 @@ namespace SmartReference.Runtime {
     public class SceneReference {
         [SerializeField]
         private string scenePath;
+        
+        /// <summary>
+        /// Get the scene path.
+        /// </summary>
         public string ScenePath => scenePath;
     }
 }
