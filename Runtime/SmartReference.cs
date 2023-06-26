@@ -4,20 +4,48 @@ using Object = UnityEngine.Object;
 // ReSharper disable NotAccessedField.Global used in serialization
 
 namespace SmartReference.Runtime {
-    public delegate Object SmartReferenceLoader(string path, Type type);
-    public delegate void SmartReferenceLoaderAsync(string path, Type type, Action<Object> callback);
-    
     [Serializable]
     public abstract class SmartReference {
         public string guid;
         public long fileID;
         public string path;
 
-        protected static SmartReferenceLoader loader;
-        protected static SmartReferenceLoaderAsync loaderAsync;
-        public static void Init(SmartReferenceLoader mLoader, SmartReferenceLoaderAsync mLoaderAsync) {
-            loader = mLoader;
-            loaderAsync = mLoaderAsync;
+        protected static ISmartReferenceLoader loader;
+        
+        /// <summary>
+        /// Use this method to initialize the loader if you want to use Resources for loading assets.
+        /// </summary>
+        public static void InitWithResourcesLoader() {
+            loader = new ResourcesLoader();
+        }
+        
+#if USE_UNITY_ADDRESSABLES
+        /// <summary>
+        /// Use this method to initialize the loader if you want to use Unity Addressables for loading assets.
+        /// </summary>
+        public static void InitWithAddressablesLoader() {
+            loader = new AddressablesLoader();
+        }
+#endif
+        
+        /// <summary>
+        /// Use this method to initialize the loader if you want to use a custom loader.
+        /// </summary>
+        /// <param name="loader">Loader that load and return asset synchronously.</param>
+        /// <param name="loaderAsync">Loader that load and return asset asynchronously.</param>
+        public static void InitWithCustomLoader(SmartReferenceLoader loader, SmartReferenceLoaderAsync loaderAsync) {
+            SmartReference.loader = new CustomLoader {
+                loader = loader,
+                loaderAsync = loaderAsync,
+            };
+        }
+        
+        /// <summary>
+        /// Use this method to initialize the loader if you want to use a custom loader.
+        /// </summary>
+        /// <param name="loader">The custom loader that you create.</param>
+        public static void InitWithCustomLoader(CustomLoader loader) {
+            SmartReference.loader = loader;
         }
     }
     
@@ -55,7 +83,7 @@ namespace SmartReference.Runtime {
                 return;
             }
             
-            value = (T) loader(path, typeof(T));
+            value = (T) loader.Load(path, typeof(T));
             if (value == null) {
                 Debug.LogWarning($"[SmartReference] load failed, path: {path}");
             }
@@ -67,12 +95,12 @@ namespace SmartReference.Runtime {
         public void LoadAsync() {
             if (string.IsNullOrEmpty(path)) return;
             
-            if (loaderAsync == null) {
+            if (loader == null) {
                 Debug.LogError($"[SmartReference] loaderAsync is null, path: {path}");
                 return;
             }
             
-            loaderAsync(path, typeof(T), obj => {
+            loader.LoadAsync(path, typeof(T), obj => {
                 if (obj == null) {
                     Debug.LogWarning($"[SmartReference] loadAsync failed, path: {path}");
                 }

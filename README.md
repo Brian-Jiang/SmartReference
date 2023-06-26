@@ -1,5 +1,5 @@
 # Smart Reference
-#### version 0.7.0
+#### version 0.8.0
 
 ## Summary
 Smart Reference is a Unity plugin that allows you to lazy load references to other objects in ScriptableObject and MonoBehaviour.
@@ -18,6 +18,7 @@ This could be slow if you have a lot of references. Smart Reference allows you t
 
 2. In your start up script, call SmartReference.Init() to initialize the SmartReference system with your load and async load functions.
 ```csharp
+USE_UNITY_ADDRESSABLES
     SmartReference.Runtime.SmartReference.Init((path, type) => {
         return MyLoadFunction.Load(path, type);
     }, (path, type, callback) => {
