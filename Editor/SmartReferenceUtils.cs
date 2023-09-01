@@ -56,12 +56,13 @@ namespace SmartReference.Editor {
                 if (obj != null && AssetDatabase.TryGetGUIDAndLocalFileIdentifier(obj, out var guid, out long objFileID)) {
                     smartReference.guid = AssetDatabase.AssetPathToGUID(smartReference.path);
                     smartReference.fileID = objFileID;
+                    Debug.LogWarning("[SmartReference] The object referenced is missing, try to update guid and fileID with path");
                     succeed = true;
                 }
             }
             
             if (!succeed) {
-                Debug.LogError($"[SmartReferenceEditor] Failed to update smart reference, path: {smartReference.path}");
+                Debug.LogError($"[SmartReference] Failed to update smart reference, path: {smartReference.path}");
             }
         }
 
@@ -92,12 +93,13 @@ namespace SmartReference.Editor {
                 if (obj != null && AssetDatabase.TryGetGUIDAndLocalFileIdentifier(obj, out var guid, out long objFileID)) {
                     guidProp.stringValue = AssetDatabase.AssetPathToGUID(pathProp.stringValue);
                     fileIDProp.longValue = objFileID;
+                    Debug.LogWarning("[SmartReference] The object referenced is missing, try to update guid and fileID with path");
                     succeed = true;
                 }
             }
             
             if (!succeed) {
-                Debug.LogError($"[SmartReferenceEditor] Failed to update smart reference, path: {pathProp.stringValue}");
+                Debug.LogError($"[SmartReference] Failed to update smart reference, path: {pathProp.stringValue}");
             }
         }
         
