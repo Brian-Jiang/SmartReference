@@ -31,33 +31,24 @@ namespace SmartReference.Editor {
                         }
                     }
                 }
-                
             }
             
-            // var objectArray = property.serializedObject.targetObjects;
-            // var sType = objectArray[0].GetType();
-            // var oType = sType.GetField(property.propertyPath).FieldType.GenericTypeArguments[0];
             var type = Type.GetType(property.FindPropertyRelative("type").stringValue);
             // var type = GetNestedObjectType(property, property.propertyPath, property.depth);
             var referenced = EditorGUI.ObjectField(position, label, referencedObject, type, false);
             if (referencedObject != referenced) {
                 if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(referenced, out var guid, out long fileID)) {
-                    Debug.LogError($"[SmartReferenceEditor] failed to get guid and fileID, path: {AssetDatabase.GetAssetPath(referenced)}");
+                    Debug.LogError($"[SmartReferenceEditor] Failed to get guid and fileID, path: {AssetDatabase.GetAssetPath(referenced)}");
                     return;
                 }
                 
                 guidProp.stringValue = guid;
                 fileIDProp.longValue = fileID;
                 
-                // property.FindPropertyRelative("type").stringValue = oType.FullName;
                 referencedObject = referenced;
             }
             
             pathProp.stringValue = AssetDatabase.GetAssetPath(referenced);
-
-            // if (referencedObject != null) {
-            //     EditorGUI.bo
-            // }
         }
     }
 }
