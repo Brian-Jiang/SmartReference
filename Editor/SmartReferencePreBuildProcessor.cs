@@ -1,13 +1,13 @@
-﻿using UnityEditor;
-using UnityEditor.Build;
+﻿using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
+using UnityEngine;
 
 namespace SmartReference.Editor {
     public class SmartReferencePreBuildProcessor: IPreprocessBuildWithReport {
         public int callbackOrder => 0;
         
         public void OnPreprocessBuild(BuildReport report) {
-            // update all references
+            Debug.Log("[SmartReference] Prebuild - Updating all references...");
             SmartReferenceUtils.UpdateAllReferences();
         }
     }
