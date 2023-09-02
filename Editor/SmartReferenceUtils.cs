@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SmartReference.Editor {
     public static class SmartReferenceUtils {
-        [MenuItem("SmartReference/Update All References", priority = 0)]
+        [MenuItem("Tools/SmartReference/Update All References", priority = 100)]
         public static void UpdateAllReferences() {
             EditorUtility.DisplayProgressBar("SmartReference", "Updating all references...", 0);
 
