@@ -13,8 +13,10 @@ namespace SmartReference.Editor {
             try {
                 var typeList = GetTypesWithSpecificField(typeof(Runtime.SmartReference));
                 foreach (var type in typeList) {
-                    var assets = Resources.FindObjectsOfTypeAll(type);
-                    foreach (var asset in assets) {
+                    var guids = AssetDatabase.FindAssets($"t:{type.Name}");
+                    foreach (var guid in guids) {
+                        var path = AssetDatabase.GUIDToAssetPath(guid);
+                        var asset = AssetDatabase.LoadAssetAtPath(path, type);
                         var serializedObject = new SerializedObject(asset);
                         var fields = type.GetFields(
                             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -31,8 +33,8 @@ namespace SmartReference.Editor {
             }
             finally {
                 EditorUtility.ClearProgressBar();
+                AssetDatabase.SaveAssets();
             }
-            
         }
 
         public static void UpdateReference(this Runtime.SmartReference smartReference) {
