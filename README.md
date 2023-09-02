@@ -1,5 +1,5 @@
 # Smart Reference
-#### version 0.8.0
+#### version 0.9.0
 
 ## Summary
 Smart Reference is a Unity plugin that allows you to lazy load references to other objects in ScriptableObject and MonoBehaviour.
@@ -45,6 +45,9 @@ Smart Reference allows you to load references only when you need them at runtime
         ```csharp
         SmartReference.Runtime.SmartReference.InitWithResourcesLoader();
         ```
+      
+3. SmartReference will automatically update paths before player build in case you move or rename the referenced asset.
+   If you want to manually update all references in the project, go to `Tools/SmartReference/Update All References` to update all references in the project.
 
 ## Supports
 If you have any questions, please leave an issue at [GitHub](https://github.com/Brian-Jiang/SmartReference/issues).

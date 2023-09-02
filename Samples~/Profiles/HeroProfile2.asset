@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a848bc2040203a4ea256dca21ccb929, type: 3}
+  m_Name: HeroProfile2
+  m_EditorClassIdentifier: 
+  id: 2
+  heroName: HeroTwo
+  prefab:
+    guid: 5e44f9f8caa747f46963b570938eaa7f
+    fileID: 5880176419224055335
+    path: Assets/SmartReference/Samples/Prefabs/Hero1.prefab
+    type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  icon:
+    guid: 0000000000000000f000000000000000
+    fileID: 10307
+    path: Resources/unity_builtin_extra
+    type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  attackData:
+    baseDamage: 10
+    damageMultiplier: 1.5
+    effect:
+      guid: 6df6002144fcba04d9e25db9e6041fb8
+      fileID: 5880176419224055335
+      path: Assets/SmartReference/Samples/Prefabs/Effect1.prefab
+      type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+  skillEffects:
+  - guid: 47845f5e9f69c1d4b8fff35fdbc95f2e
+    fileID: 5880176419224055335
+    path: Assets/SmartReference/Samples/Prefabs/Effect2.prefab
+    type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - guid: 276b2247f1d50fe4fb8904a3053a9fe5
+    fileID: 5880176419224055335
+    path: Assets/SmartReference/Samples/Prefabs/Effect3.prefab
+    type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null

@@ -1,14 +1,22 @@
 {
   "name": "com.xiaojiang.smartreference",
   "displayName": "Smart Reference",
-  "version": "0.7.0",
+  "version": "0.9.0",
   "unity": "2020.3",
+  "license": "MIT",
   "author": {
     "name": "Xiao Jiang",
     "email": "bjjx1999@live.com"
   },
   "description": "Smart Reference is a Unity plugin that allows you to lazy load references to other objects in ScriptableObject and MonoBehaviour.",
   "documentationUrl": "https://brian-jiang.github.io/SmartReference/",
+  "samples": [
+    {
+      "displayName": "Sample",
+      "description": "A simple sample to show how to use Smart Reference.",
+      "path": "Samples~"
+    }
+  ],
   "keywords": [
     "unity",
     "scriptableobject",

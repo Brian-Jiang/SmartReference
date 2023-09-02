@@ -11,13 +11,17 @@ namespace SmartReference.Editor {
         private SerializedProperty guidProp;
         private SerializedProperty fileIDProp;
         private SerializedProperty pathProp;
+        private SerializedProperty typeProp;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
             if (!SerializedProperty.EqualContents(property, cacheProperty)) {
                 cacheProperty = property;
+                referencedObject = null;
                 guidProp = property.FindPropertyRelative("guid");
                 fileIDProp = property.FindPropertyRelative("fileID");
                 pathProp = property.FindPropertyRelative("path");
+                typeProp = property.FindPropertyRelative("type");
+                SmartReferenceUtils.UpdateReferenceWithProperty(property);
                 if (!string.IsNullOrEmpty(guidProp.stringValue)) {
                     var guid = guidProp.stringValue;
                     var fileID = fileIDProp.longValue;
@@ -31,33 +35,30 @@ namespace SmartReference.Editor {
                         }
                     }
                 }
-                
             }
             
-            // var objectArray = property.serializedObject.targetObjects;
-            // var sType = objectArray[0].GetType();
-            // var oType = sType.GetField(property.propertyPath).FieldType.GenericTypeArguments[0];
-            var type = Type.GetType(property.FindPropertyRelative("type").stringValue);
-            // var type = GetNestedObjectType(property, property.propertyPath, property.depth);
+            var type = Type.GetType(typeProp.stringValue);
             var referenced = EditorGUI.ObjectField(position, label, referencedObject, type, false);
             if (referencedObject != referenced) {
+                if (referenced == null) {
+                    guidProp.stringValue = string.Empty;
+                    fileIDProp.longValue = 0;
+                    pathProp.stringValue = string.Empty;
+                    return;
+                }
+                
                 if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(referenced, out var guid, out long fileID)) {
-                    Debug.LogError($"[SmartReferenceEditor] failed to get guid and fileID, path: {AssetDatabase.GetAssetPath(referenced)}");
+                    Debug.LogError(
+                        $"[SmartReferenceEditor] Failed to get guid and fileID, path: {AssetDatabase.GetAssetPath(referenced)}");
                     return;
                 }
                 
                 guidProp.stringValue = guid;
                 fileIDProp.longValue = fileID;
+                pathProp.stringValue = AssetDatabase.GetAssetPath(referenced);
                 
-                // property.FindPropertyRelative("type").stringValue = oType.FullName;
                 referencedObject = referenced;
             }
-            
-            pathProp.stringValue = AssetDatabase.GetAssetPath(referenced);
-
-            // if (referencedObject != null) {
-            //     EditorGUI.bo
-            // }
         }
     }
 }

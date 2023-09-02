@@ -9,6 +9,7 @@ namespace SmartReference.Runtime {
         public string guid;
         public long fileID;
         public string path;
+        public string type;
 
         protected static ISmartReferenceLoader loader;
         
@@ -51,9 +52,6 @@ namespace SmartReference.Runtime {
     
     [Serializable]
     public class SmartReference<T>: SmartReference, ISerializationCallbackReceiver where T: Object {
-        [SerializeField]
-        private string type;
-
         private T value;
         /// <summary>
         /// Get the asset. If the asset is not loaded, it will be loaded automatically.
