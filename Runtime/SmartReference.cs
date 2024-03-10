@@ -2,6 +2,7 @@
 using UnityEngine;
 using Object = UnityEngine.Object;
 // ReSharper disable NotAccessedField.Global used in serialization
+// ReSharper disable ParameterHidesMember
 
 namespace SmartReference.Runtime {
     [Serializable]
@@ -53,6 +54,7 @@ namespace SmartReference.Runtime {
     [Serializable]
     public class SmartReference<T>: SmartReference, ISerializationCallbackReceiver where T: Object {
         private T value;
+        
         /// <summary>
         /// Get the asset. If the asset is not loaded, it will be loaded automatically.
         /// </summary>
