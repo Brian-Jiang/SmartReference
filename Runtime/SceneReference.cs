@@ -10,6 +10,15 @@ namespace SmartReference.Runtime {
         /// <summary>
         /// Get the scene path.
         /// </summary>
+        // ReSharper disable once UnusedMember.Global
         public string ScenePath => scenePath;
+
+        public override string ToString() {
+            return scenePath;
+        }
+        
+        public static implicit operator string(SceneReference sceneReference) {
+            return sceneReference.scenePath;
+        }
     }
 }

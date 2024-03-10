@@ -10,7 +10,7 @@ namespace SmartReference.Runtime {
 
         public void LoadAsync(string path, Type type, Action<Object> callback) {
             var request = Resources.LoadAsync(path, type);
-            request.completed += operation => callback?.Invoke(request.asset);
+            request.completed += _ => callback?.Invoke(request.asset);
         }
     }
 }
