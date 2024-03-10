@@ -1,5 +1,5 @@
 # Smart Reference
-#### version 0.9.0
+#### version 1.0.0
 
 ## Summary
 Smart Reference is a Unity plugin that allows you to lazy load references to other objects in ScriptableObject and MonoBehaviour.
@@ -17,9 +17,21 @@ Smart Reference allows you to load references only when you need them at runtime
             public string description;
         }
     ```
+   Use SceneReference instead of entering scene name as string.
+   See the info tip or auto fix button if the scene is missing or not enabled in build settings.
+    ```csharp
+        public class GameConfig : ScriptableObject {
+            public SceneReference startScene;
+        }
+    ```
+   Use them exactly same way as you use regular Object and scene name.
+    ```csharp
+        Object.Instantiate(monsterData.prefab, position, rotation);
+        SceneManager.LoadSceneAsync(gameConfig.startScene);
+    ```
 
 2. Initialize smart reference when your game start
-    - If you use Unity Addressables, you need to add USE_UNITY_ADDRESSABLES symbol to your player settings, then call
+    - If you use Unity Addressables, call this when your game start
         ```csharp
         SmartReference.Runtime.SmartReference.InitWithAddressablesLoader();
         ```
@@ -47,7 +59,7 @@ Smart Reference allows you to load references only when you need them at runtime
         ```
       
 3. SmartReference will automatically update paths before player build in case you move or rename the referenced asset.
-   If you want to manually update all references in the project, go to `Tools/SmartReference/Update All References` to update all references in the project.
+   If you want to manually update all references in the project, go to `Tools -> SmartReference -> Update All References` to update all references in the project.
 
 ## Supports
 If you have any questions, please leave an issue at [GitHub](https://github.com/Brian-Jiang/SmartReference/issues).
