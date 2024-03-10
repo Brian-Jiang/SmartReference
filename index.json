@@ -1,0 +1,52 @@
+{
+  "api/SmartReference.Runtime.CustomLoader.html": {
+    "href": "api/SmartReference.Runtime.CustomLoader.html",
+    "title": "Class CustomLoader | Smart Reference",
+    "keywords": "Class CustomLoader Inheritance Object CustomLoader Implements ISmartReferenceLoader Namespace : SmartReference.Runtime Assembly : cs.temp.dll.dll Syntax public class CustomLoader : ISmartReferenceLoader Fields loader Declaration public SmartReferenceLoader loader Field Value Type Description SmartReferenceLoader loaderAsync Declaration public SmartReferenceLoaderAsync loaderAsync Field Value Type Description SmartReferenceLoaderAsync Methods Load(String, Type) Declaration public object Load(string path, Type type) Parameters Type Name Description String path Type type Returns Type Description Object LoadAsync(String, Type, Action<Object>) Declaration public void LoadAsync(string path, Type type, Action<object> callback) Parameters Type Name Description String path Type type Action < Object > callback Implements ISmartReferenceLoader"
+  },
+  "api/SmartReference.Runtime.html": {
+    "href": "api/SmartReference.Runtime.html",
+    "title": "Namespace SmartReference.Runtime | Smart Reference",
+    "keywords": "Namespace SmartReference.Runtime Classes CustomLoader ResourcesLoader SceneReference SmartReference SmartReference<T> Interfaces ISmartReferenceLoader Delegates SmartReferenceLoader SmartReferenceLoaderAsync"
+  },
+  "api/SmartReference.Runtime.ISmartReferenceLoader.html": {
+    "href": "api/SmartReference.Runtime.ISmartReferenceLoader.html",
+    "title": "Interface ISmartReferenceLoader | Smart Reference",
+    "keywords": "Interface ISmartReferenceLoader Namespace : SmartReference.Runtime Assembly : cs.temp.dll.dll Syntax public interface ISmartReferenceLoader Methods Load(String, Type) Declaration object Load(string path, Type type) Parameters Type Name Description String path Type type Returns Type Description Object LoadAsync(String, Type, Action<Object>) Declaration void LoadAsync(string path, Type type, Action<object> callback) Parameters Type Name Description String path Type type Action < Object > callback"
+  },
+  "api/SmartReference.Runtime.ResourcesLoader.html": {
+    "href": "api/SmartReference.Runtime.ResourcesLoader.html",
+    "title": "Class ResourcesLoader | Smart Reference",
+    "keywords": "Class ResourcesLoader Inheritance Object ResourcesLoader Implements ISmartReferenceLoader Namespace : SmartReference.Runtime Assembly : cs.temp.dll.dll Syntax public class ResourcesLoader : ISmartReferenceLoader Methods Load(String, Type) Declaration public object Load(string path, Type type) Parameters Type Name Description String path Type type Returns Type Description Object LoadAsync(String, Type, Action<Object>) Declaration public void LoadAsync(string path, Type type, Action<object> callback) Parameters Type Name Description String path Type type Action < Object > callback Implements ISmartReferenceLoader"
+  },
+  "api/SmartReference.Runtime.SceneReference.html": {
+    "href": "api/SmartReference.Runtime.SceneReference.html",
+    "title": "Class SceneReference | Smart Reference",
+    "keywords": "Class SceneReference Inheritance Object SceneReference Namespace : SmartReference.Runtime Assembly : cs.temp.dll.dll Syntax [Serializable] public class SceneReference Properties ScenePath Get the scene path. Declaration public string ScenePath { get; } Property Value Type Description String Methods ToString() Declaration public override string ToString() Returns Type Description String Overrides Object.ToString() Operators Implicit(SceneReference to String) Declaration public static implicit operator string (SceneReference sceneReference) Parameters Type Name Description SceneReference sceneReference Returns Type Description String"
+  },
+  "api/SmartReference.Runtime.SmartReference.html": {
+    "href": "api/SmartReference.Runtime.SmartReference.html",
+    "title": "Class SmartReference | Smart Reference",
+    "keywords": "Class SmartReference Inheritance Object SmartReference SmartReference<T> Namespace : SmartReference.Runtime Assembly : cs.temp.dll.dll Syntax [Serializable] public abstract class SmartReference Fields fileID Declaration public long fileID Field Value Type Description Int64 guid Declaration public string guid Field Value Type Description String loader Declaration protected static ISmartReferenceLoader loader Field Value Type Description ISmartReferenceLoader path Declaration public string path Field Value Type Description String type Declaration public string type Field Value Type Description String Methods InitWithCustomLoader(CustomLoader) Use this method to initialize the loader if you want to use a custom loader. Declaration public static void InitWithCustomLoader(CustomLoader loader) Parameters Type Name Description CustomLoader loader The custom loader that you create. InitWithCustomLoader(SmartReferenceLoader, SmartReferenceLoaderAsync) Use this method to initialize the loader if you want to use a custom loader. Declaration public static void InitWithCustomLoader(SmartReferenceLoader loader, SmartReferenceLoaderAsync loaderAsync) Parameters Type Name Description SmartReferenceLoader loader Loader that load and return asset synchronously. SmartReferenceLoaderAsync loaderAsync Loader that load and return asset asynchronously. InitWithResourcesLoader() Use this method to initialize the loader if you want to use Resources for loading assets. Declaration public static void InitWithResourcesLoader()"
+  },
+  "api/SmartReference.Runtime.SmartReference-1.html": {
+    "href": "api/SmartReference.Runtime.SmartReference-1.html",
+    "title": "Class SmartReference<T> | Smart Reference",
+    "keywords": "Class SmartReference<T> Inheritance Object SmartReference SmartReference<T> Implements ISerializationCallbackReceiver Inherited Members SmartReference.guid SmartReference.fileID SmartReference.path SmartReference.type SmartReference.loader SmartReference.InitWithResourcesLoader() SmartReference.InitWithCustomLoader(SmartReferenceLoader, SmartReferenceLoaderAsync) SmartReference.InitWithCustomLoader(CustomLoader) Namespace : SmartReference.Runtime Assembly : cs.temp.dll.dll Syntax [Serializable] public class SmartReference<T> : SmartReference Type Parameters Name Description T Properties Value Get the asset. If the asset is not loaded, it will be loaded automatically. Declaration public T Value { get; } Property Value Type Description T Methods Load() Call this method to load the asset. This would be called automatically when you access the Value property. Declaration public void Load() LoadAsync() Call this method to load the asset asynchronously. Useful if you want to preload the asset. Declaration public void LoadAsync() OnAfterDeserialize() Declaration public void OnAfterDeserialize() OnBeforeSerialize() Declaration public void OnBeforeSerialize() Operators Implicit(SmartReference<T> to T) Declaration public static implicit operator T(SmartReference<T> reference) Parameters Type Name Description SmartReference <T> reference Returns Type Description T Implements ISerializationCallbackReceiver"
+  },
+  "api/SmartReference.Runtime.SmartReferenceLoader.html": {
+    "href": "api/SmartReference.Runtime.SmartReferenceLoader.html",
+    "title": "Delegate SmartReferenceLoader | Smart Reference",
+    "keywords": "Delegate SmartReferenceLoader Namespace : SmartReference.Runtime Assembly : cs.temp.dll.dll Syntax public delegate object SmartReferenceLoader(string path, Type type); Parameters Type Name Description String path Type type Returns Type Description Object"
+  },
+  "api/SmartReference.Runtime.SmartReferenceLoaderAsync.html": {
+    "href": "api/SmartReference.Runtime.SmartReferenceLoaderAsync.html",
+    "title": "Delegate SmartReferenceLoaderAsync | Smart Reference",
+    "keywords": "Delegate SmartReferenceLoaderAsync Namespace : SmartReference.Runtime Assembly : cs.temp.dll.dll Syntax public delegate void SmartReferenceLoaderAsync(string path, Type type, Action<object> callback); Parameters Type Name Description String path Type type Action < Object > callback"
+  },
+  "index.html": {
+    "href": "index.html",
+    "title": "Smart Reference | Smart Reference",
+    "keywords": "Smart Reference version 1.0.0 Summary Smart Reference is a Unity plugin that allows you to lazy load references to other objects in ScriptableObject and MonoBehaviour. You may be familiar to use ScriptableObject store data, but when you reference other objects, they will be treated as dependencies and will be loaded when the ScriptableObject is loaded. This could be slow if you have a lot of references. For details, see this article . Smart Reference allows you to load references only when you need them at runtime with same workflow in editor. Quick Start Use SmartReference instead of Object. See how they look exactly same in the inspector. public class MonsterData : ScriptableObject { public SmartReference<GameObject> prefab; public SmartReference<Sprite> icon; public string description; } Use SceneReference instead of entering scene name as string. See the info tip or auto fix button if the scene is missing or not enabled in build settings. public class GameConfig : ScriptableObject { public SceneReference startScene; } Use them exactly same way as you use regular Object and scene name. Object.Instantiate(monsterData.prefab, position, rotation); SceneManager.LoadSceneAsync(gameConfig.startScene); Initialize smart reference when your game start If you use Unity Addressables, call this when your game start SmartReference.Runtime.SmartReference.InitWithAddressablesLoader(); If you use your own custom loader, call SmartReference.Runtime.SmartReference.Init((path, type) => { return MyLoadFunction.Load(path, type); }, (path, type, callback) => { MyLoadFunction.LoadAsync(path, type, obj => { callback(obj); }); }); or var loader = new CustomLoader { loader = MyLoadFunction, loaderAsync = MyAsyncLoadFunction, }; SmartReference.Runtime.SmartReference.Init(loader); If you use Unity Resources(not recommended, see why ), call SmartReference.Runtime.SmartReference.InitWithResourcesLoader(); SmartReference will automatically update paths before player build in case you move or rename the referenced asset. If you want to manually update all references in the project, go to Tools -> SmartReference -> Update All References to update all references in the project. Supports If you have any questions, please leave an issue at GitHub . Thank you for your support!"
+  }
+}

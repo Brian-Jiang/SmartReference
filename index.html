@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Smart Reference | Smart Reference </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Smart Reference | Smart Reference ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles/docfx.vendor.css">
+    <link rel="stylesheet" href="styles/docfx.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta property="docfx:navrel" content="toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="index.html">
+                <img id="logo" class="svg" src="logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="smart-reference">Smart Reference</h1>
+
+<h4 id="version-100">version 1.0.0</h4>
+<h2 id="summary">Summary</h2>
+<p>Smart Reference is a Unity plugin that allows you to lazy load references to other objects in ScriptableObject and MonoBehaviour.
+You may be familiar to use ScriptableObject store data, but when you reference other objects,
+they will be treated as dependencies and will be loaded when the ScriptableObject is loaded. This could be slow if you have a lot of references.
+For details, see <a href="https://medium.com/@bjjx1999/3-ways-to-reduce-load-time-in-runtime-for-unity-15d33003eb79">this article</a>.<br>
+Smart Reference allows you to load references only when you need them at runtime with same workflow in editor.</p>
+<h2 id="quick-start">Quick Start</h2>
+<ol>
+<li><p>Use SmartReference instead of Object. See how they look exactly same in the inspector.</p>
+<pre><code class="lang-csharp">    public class MonsterData : ScriptableObject {
+        public SmartReference&lt;GameObject&gt; prefab;
+        public SmartReference&lt;Sprite&gt; icon;
+        public string description;
+    }
+</code></pre>
+<p>Use SceneReference instead of entering scene name as string.
+See the info tip or auto fix button if the scene is missing or not enabled in build settings.</p>
+<pre><code class="lang-csharp">    public class GameConfig : ScriptableObject {
+        public SceneReference startScene;
+    }
+</code></pre>
+<p>Use them exactly same way as you use regular Object and scene name.</p>
+<pre><code class="lang-csharp">    Object.Instantiate(monsterData.prefab, position, rotation);
+    SceneManager.LoadSceneAsync(gameConfig.startScene);
+</code></pre>
+</li>
+<li><p>Initialize smart reference when your game start</p>
+<ul>
+<li>If you use Unity Addressables, call this when your game start
+<pre><code class="lang-csharp">SmartReference.Runtime.SmartReference.InitWithAddressablesLoader();
+</code></pre>
+</li>
+<li>If you use your own custom loader, call
+<pre><code class="lang-csharp">SmartReference.Runtime.SmartReference.Init((path, type) =&gt; {
+    return MyLoadFunction.Load(path, type);
+}, (path, type, callback) =&gt; {
+    MyLoadFunction.LoadAsync(path, type, obj =&gt; {
+        callback(obj);
+    });
+});
+</code></pre>
+or
+<pre><code class="lang-csharp">var loader = new CustomLoader {
+    loader = MyLoadFunction,
+    loaderAsync = MyAsyncLoadFunction,
+};
+SmartReference.Runtime.SmartReference.Init(loader);
+</code></pre>
+</li>
+<li>If you use Unity Resources(not recommended, see <a href="https://medium.com/@bjjx1999/3-ways-to-reduce-load-time-in-runtime-for-unity-15d33003eb79">why</a>), call
+<pre><code class="lang-csharp">SmartReference.Runtime.SmartReference.InitWithResourcesLoader();
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p>SmartReference will automatically update paths before player build in case you move or rename the referenced asset.
+If you want to manually update all references in the project, go to <code>Tools -&gt; SmartReference -&gt; Update All References</code> to update all references in the project.</p>
+</li>
+</ol>
+<h2 id="supports">Supports</h2>
+<p>If you have any questions, please leave an issue at <a href="https://github.com/Brian-Jiang/SmartReference/issues">GitHub</a>.
+Thank you for your support!</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/Brian-Jiang/SmartReference/blob/main/Tools~/DocFx/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Smart Reference
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>
