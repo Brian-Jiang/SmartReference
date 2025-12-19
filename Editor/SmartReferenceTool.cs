@@ -53,7 +53,6 @@ namespace SmartReference.Editor
             smartReferenceProperty.FindPropertyRelative("guid").stringValue = string.Empty;
             smartReferenceProperty.FindPropertyRelative("fileID").longValue = 0;
             smartReferenceProperty.FindPropertyRelative("path").stringValue = string.Empty;
-            smartReferenceProperty.FindPropertyRelative("type").stringValue = string.Empty;
 
             smartReferenceProperty.serializedObject.ApplyModifiedProperties();
         }
