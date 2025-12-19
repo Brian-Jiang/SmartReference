@@ -1,4 +1,6 @@
-﻿using UnityEngine.ResourceManagement.AsyncOperations;
+﻿#if SMARTREFERENCE_ADDRESSABLES_SUPPORT
+
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace SmartReference.Runtime
 {
@@ -8,3 +10,5 @@ namespace SmartReference.Runtime
         public bool IsValid => Op.IsValid();
     }
 }
+
+#endif

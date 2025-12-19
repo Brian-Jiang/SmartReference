@@ -299,14 +299,14 @@ namespace SmartReference.Runtime
             isLoading = false;
             if (obj == null)
             {
-                LogLoadAssetNullError();
                 CompleteInFlight(null);
-                
-                // If we were asked to release while loading, clean up handle too.
                 if (releaseRequested)
                 {
                     Release();
+                    return;
                 }
+                
+                LogLoadAssetNullError();
                 
                 return;
             }

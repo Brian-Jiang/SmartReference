@@ -1,0 +1,33 @@
+{
+    "name": "SmartReference.Runtime.Tests",
+    "rootNamespace": "SmartReference.Runtime.Tests",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "SmartReference.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.addressables",
+            "expression": "",
+            "define": "SMARTREFERENCE_ADDRESSABLES_SUPPORT"
+        },
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "SMARTREFERENCE_UNITASK_SUPPORT"
+        }
+    ],
+    "noEngineReferences": false
+}
