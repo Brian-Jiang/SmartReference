@@ -1,6 +1,6 @@
 ﻿{
   "name": "SmartReference.Editor",
-  "rootNamespace": "SmartReference",
+  "rootNamespace": "SmartReference.Editor",
   "includePlatforms": [
     "Editor"
   ],

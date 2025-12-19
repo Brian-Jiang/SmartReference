@@ -1,11 +1,12 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SmartReference.Runtime {
+namespace SmartReference.Runtime
+{
     [Serializable]
-    public class SceneReference {
-        [SerializeField]
-        private string scenePath;
+    public class SceneReference
+    {
+        [SerializeField] private string scenePath;
         
         /// <summary>
         /// Get the scene path.
@@ -13,11 +14,13 @@ namespace SmartReference.Runtime {
         // ReSharper disable once UnusedMember.Global
         public string ScenePath => scenePath;
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return scenePath;
         }
         
-        public static implicit operator string(SceneReference sceneReference) {
+        public static implicit operator string(SceneReference sceneReference)
+        {
             return sceneReference.scenePath;
         }
     }

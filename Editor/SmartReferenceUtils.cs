@@ -4,13 +4,17 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace SmartReference.Editor {
-    public static class SmartReferenceUtils {
+namespace SmartReference.Editor
+{
+    public static class SmartReferenceUtils
+    {
         [MenuItem("Tools/SmartReference/Update All References", priority = 100)]
-        public static void UpdateAllReferences() {
+        public static void UpdateAllReferences()
+        {
             EditorUtility.DisplayProgressBar("SmartReference", "Updating all references...", 0);
 
-            try {
+            try
+            {
                 var typeList = GetTypesWithSpecificField(typeof(Runtime.SmartReference));
                 foreach (var type in typeList) {
                     var guids = AssetDatabase.FindAssets($"t:{type.Name}");
@@ -37,7 +41,8 @@ namespace SmartReference.Editor {
             }
         }
 
-        public static void UpdateReference(this Runtime.SmartReference smartReference) {
+        public static void UpdateReference(this Runtime.SmartReference smartReference)
+        {
             if (smartReference == null || string.IsNullOrEmpty(smartReference.guid)) return;
 
             var succeed = false;
@@ -68,7 +73,8 @@ namespace SmartReference.Editor {
             }
         }
 
-        internal static void UpdateReferenceWithProperty(SerializedProperty property) {
+        internal static void UpdateReferenceWithProperty(SerializedProperty property)
+        {
             if (property == null) return;
 
             var guidProp = property.FindPropertyRelative("guid");
@@ -110,7 +116,7 @@ namespace SmartReference.Editor {
             List<Type> result = new List<Type>();
 
             // Iterating over all assemblies
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 // Optional: Filter the assemblies by name if necessary
                 var fullName = assembly.FullName;
@@ -118,7 +124,7 @@ namespace SmartReference.Editor {
                     fullName.StartsWith("Unity.") || fullName.StartsWith("Bee.") ||
                     fullName.StartsWith("System.") || fullName.StartsWith("Mono.")) continue;
 
-                foreach (Type type in assembly.GetTypes())
+                foreach (var type in assembly.GetTypes())
                 {
                     // Safeguard against types that might throw exceptions
                     try

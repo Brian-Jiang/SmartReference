@@ -3,9 +3,11 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SmartReference.Editor {
+namespace SmartReference.Editor
+{
     [CustomPropertyDrawer(typeof(Runtime.SmartReference), true)]
-    internal class SmartReferenceEditor: PropertyDrawer {
+    internal class SmartReferenceEditor: PropertyDrawer
+    {
         private SerializedProperty cacheProperty;
         private Object referencedObject;
         private SerializedProperty guidProp;
@@ -13,7 +15,8 @@ namespace SmartReference.Editor {
         private SerializedProperty pathProp;
         private SerializedProperty typeProp;
 
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
             if (!SerializedProperty.EqualContents(property, cacheProperty)) {
                 cacheProperty = property;
                 referencedObject = null;

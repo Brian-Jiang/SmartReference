@@ -2,14 +2,17 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace SmartReference.Editor {
+namespace SmartReference.Editor
+{
     [CustomPropertyDrawer(typeof(Runtime.SceneReference), true)]
-    internal class SceneReferenceEditor: PropertyDrawer {
+    internal class SceneReferenceEditor: PropertyDrawer
+    {
         private SerializedProperty cacheProperty;
         private SceneAsset currentScene;
         private SerializedProperty scenePathProp;
         
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
             if (!SerializedProperty.EqualContents(property, cacheProperty)) {
                 cacheProperty = property;
                 scenePathProp = property.FindPropertyRelative("scenePath");
@@ -64,7 +67,8 @@ namespace SmartReference.Editor {
             }
         }
 
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
             var height = EditorGUIUtility.singleLineHeight;
             var scenePath = property.FindPropertyRelative("scenePath").stringValue;
             var buildSettingsScenes = EditorBuildSettings.scenes;
