@@ -16,6 +16,7 @@ namespace SmartReference.Editor
             if (obj == null)
             {
                 ClearReference(smartReferenceProperty);
+                return;
             }
 
             EnsureIsSmartReferenceProperty(smartReferenceProperty);
@@ -62,7 +63,7 @@ namespace SmartReference.Editor
             // We check presence of the expected fields rather than type name, so it works with SmartReference<T>
             // stored in any container.
             if (p.propertyType != SerializedPropertyType.Generic)
-                throw new ArgumentException($"Property is not a serialized object/struct: {p.propertyPath}");
+                throw new ArgumentException($"Property is not a serialized object/struct: {p.propertyPath}, type: {p.propertyType}");
 
             if (p.FindPropertyRelative("guid") == null ||
                 p.FindPropertyRelative("fileID") == null ||

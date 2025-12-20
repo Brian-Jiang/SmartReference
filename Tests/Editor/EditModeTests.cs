@@ -109,9 +109,10 @@ namespace SmartReference.Editor.Tests
             {
                 // Material is not an asset here; save it so it becomes an asset
                 var goPath = RootFolder + "/go.prefab";
-                AssetDatabase.CreateAsset(gameObject, goPath);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
+                // AssetDatabase.CreateAsset(gameObject, goPath);
+                // AssetDatabase.SaveAssets();
+                // AssetDatabase.Refresh();
+                PrefabUtility.SaveAsPrefabAsset(gameObject, goPath);
 
                 var goAsset = AssetDatabase.LoadAssetAtPath<GameObject>(goPath);
                 Assert.NotNull(goAsset);
@@ -196,7 +197,7 @@ namespace SmartReference.Editor.Tests
             Assert.NotNull(badProp);
 
             var ex = Assert.Throws<ArgumentException>(() => SmartReferenceTool.ClearReference(badProp));
-            StringAssert.Contains("Property does not look like a SmartReference", ex.Message);
+            StringAssert.Contains("Property is not a serialized object/struct", ex.Message);
         }
 
         // ---------------------------
