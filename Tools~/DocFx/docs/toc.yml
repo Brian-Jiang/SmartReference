@@ -1,0 +1,13 @@
+﻿items:
+  - name: Initialization
+    href: init.md
+
+  - name: Loading Assets
+    items:
+      - name: Synchronous Loading
+        href: loading_sync.md
+      - name: Asynchronous Loading
+        href: loading_async.md
+
+  - name: Custom Loader
+    href: custom_loader.md

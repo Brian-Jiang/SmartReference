@@ -25,20 +25,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.1
 
-      - name: Setup .NET Core
+      - name: Setup .NET
         uses: actions/setup-dotnet@v5.0.1
         with:
-          dotnet-version: 3.1.101
+          dotnet-version: '8.0.x'
           
       - name: Setup DocFX
-        uses: crazy-max/ghaction-chocolatey@v3.4.0
-        with:
-          args: install docfx --ignore-checksums
-          
-      - name: Setup wkhtmltopdf
-        uses: crazy-max/ghaction-chocolatey@v3.4.0
-        with:
-          args: install wkhtmltopdf --ignore-checksums
+        run: dotnet tool update -g docfx
           
       - name: Copy readme
         run: cp .\README.md .\Tools~\DocFx\index.md
@@ -54,12 +47,6 @@ jobs:
         with:
           name: _site
           path: Tools~/DocFx/_site
-          
-      - name: Upload PDF
-        uses: actions/upload-artifact@v6.0.0
-        with:
-          name: _site_pdf
-          path: Tools~/DocFx/_site_pdf/DocFx.pdf
         
   deploy_test:
     needs: build
@@ -73,12 +60,6 @@ jobs:
         with:
           name: _site
           path: _site
-          
-      - name: Display structure of downloaded files
-        run: ls -R
-        
-      - name: Display current directory
-        run: pwd
 
       - name: Publish
         uses: peaceiris/actions-gh-pages@v4.0.0
@@ -100,6 +81,7 @@ jobs:
         uses: actions/download-artifact@v7.0.0
         with:
           name: _site
+          path: _site
         
       - name: Publish
         uses: peaceiris/actions-gh-pages@v4.0.0

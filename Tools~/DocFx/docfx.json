@@ -19,7 +19,8 @@
         "globalMetadata": {
             "_appTitle": "Smart Reference",
             "_appFooter": "Smart Reference",
-            "_enableSearch": true
+            "_enableSearch": true,
+            "pdf": true,
         },
         "content": [
             {
@@ -63,48 +64,48 @@
         "cleanupCacheHistory": true,
         "disableGitFeatures": false
     },
-    "pdf": {
-        "content": [
-            {
-                "files": [
-                    "index.md",
-                    "toc.yml"
-                ]
-            },
-            {
-                "src": "api",
-                "files": [
-                    "*.yml"
-                ],
-                "dest": "api"
-            },
-            {
-                "src": "docs",
-                "files": [
-                    "*.yml",
-                    "*.md"
-                ],
-                "dest": "docs"
-            }
-        ],
-        "xref": [
-            "https://normanderwan.github.io/UnityXrefMaps/xrefmap.yml"
-        ],
-        "xrefService": [
-            "https://xref.docs.microsoft.com/query?uid={uid}"
-        ],
-        "wkhtmltopdf": {
-            "additionalArguments": "--enable-local-file-access"
-        },
-        "noStdin": true,
-        "dest": "_site_pdf",
-        "globalMetadataFiles": [],
-        "fileMetadataFiles": [],
-        "postProcessors": [],
-        "markdownEngineName": "markdig",
-        "noLangKeyword": false,
-        "keepFileLink": false,
-        "cleanupCacheHistory": true,
-        "disableGitFeatures": false
-    }
+//    "pdf": {
+//        "content": [
+//            {
+//                "files": [
+//                    "index.md",
+//                    "toc.yml"
+//                ]
+//            },
+//            {
+//                "src": "api",
+//                "files": [
+//                    "*.yml"
+//                ],
+//                "dest": "api"
+//            },
+//            {
+//                "src": "docs",
+//                "files": [
+//                    "*.yml",
+//                    "*.md"
+//                ],
+//                "dest": "docs"
+//            }
+//        ],
+//        "xref": [
+//            "https://normanderwan.github.io/UnityXrefMaps/xrefmap.yml"
+//        ],
+//        "xrefService": [
+//            "https://xref.docs.microsoft.com/query?uid={uid}"
+//        ],
+//        "wkhtmltopdf": {
+//            "additionalArguments": "--enable-local-file-access"
+//        },
+//        "noStdin": true,
+//        "dest": "_site_pdf",
+//        "globalMetadataFiles": [],
+//        "fileMetadataFiles": [],
+//        "postProcessors": [],
+//        "markdownEngineName": "markdig",
+//        "noLangKeyword": false,
+//        "keepFileLink": false,
+//        "cleanupCacheHistory": true,
+//        "disableGitFeatures": false
+//    }
 }
