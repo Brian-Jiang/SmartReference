@@ -77,6 +77,14 @@
                     "*.yml"
                 ],
                 "dest": "api"
+            },
+            {
+                "src": "docs",
+                "files": [
+                    "*.yml",
+                    "*.md"
+                ],
+                "dest": "docs"
             }
         ],
         "xref": [
