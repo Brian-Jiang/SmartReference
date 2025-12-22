@@ -76,6 +76,9 @@ jobs:
           
       - name: Display structure of downloaded files
         run: ls -R
+        
+      - name: Display current directory
+        run: pwd
 
       - name: Publish
         uses: peaceiris/actions-gh-pages@v4.0.0
