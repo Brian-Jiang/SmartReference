@@ -54,10 +54,10 @@ namespace SmartReference.Runtime
         {
             // Addressables doesn't truly "cancel" loads the same way; you can release handle
             // but behavior depends on ref counting/state. We'll best-effort release op if valid.
-            if (handle is AddressablesHandle ah && ah.IsValid)
-            {
-                Addressables.Release(ah.Op);
-            }
+            // if (handle is AddressablesHandle ah && ah.IsValid)
+            // {
+            //     Addressables.Release(ah.Op);
+            // }
         }
     }
 }

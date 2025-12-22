@@ -56,7 +56,7 @@ namespace SmartReference.Runtime
     {
         [NonSerialized] private T value;
         
-        // public event Action<T> OnAsyncLoadComplete; 
+        public event Action<T> OnAsyncLoadComplete; 
         
         [NonSerialized] private bool isLoading;
         [NonSerialized] private TaskCompletionSource<T> inFlightTaskTcs;
@@ -72,8 +72,9 @@ namespace SmartReference.Runtime
         
         public bool IsLoaded => value != null;
         public bool IsLoading => isLoading;
+        public bool ReleaseRequested => releaseRequested;
 
-        
+
         /// <summary>
         /// Get the asset. If the asset is not loaded, it will be loaded automatically.
         /// </summary>
@@ -119,7 +120,7 @@ namespace SmartReference.Runtime
         {
             if (value != null)
             {
-                // OnAsyncLoadComplete?.Invoke(value);
+                OnAsyncLoadComplete?.Invoke(value);
                 return;
             }
 
@@ -245,9 +246,9 @@ namespace SmartReference.Runtime
                 {
                     Loader.Cancel(handle);
                 }
-                catch
+                catch (Exception e)
                 {
-                    // ignore - cancel may not be supported
+                    Debug.LogWarning($"[SmartReference] Cancel loading failed for asset at path: {path}. Exception: {e}");
                 }
                 return;
             }
@@ -263,7 +264,7 @@ namespace SmartReference.Runtime
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"[SmartReference] Release failed for path: {path}. Exception: {e}");
+                Debug.LogWarning($"[SmartReference] Release failed for asset at path: {path}. Exception: {e}");
             }
             finally
             {
@@ -275,6 +276,8 @@ namespace SmartReference.Runtime
         
         private void CompleteInFlight(T result)
         {
+            OnAsyncLoadComplete?.Invoke(value);
+            
             // Task
             if (inFlightTaskTcs != null)
             {
@@ -300,19 +303,11 @@ namespace SmartReference.Runtime
             if (obj == null)
             {
                 CompleteInFlight(null);
-                if (releaseRequested)
-                {
-                    Release();
-                    return;
-                }
-                
                 LogLoadAssetNullError();
-                
                 return;
             }
 
             value = (T) obj;
-            // OnAsyncLoadComplete?.Invoke(value);
             CompleteInFlight(value);
             
             // If Dispose/Release was called during loading, release immediately after completion.

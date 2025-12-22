@@ -1,5 +1,5 @@
 # Smart Reference
-#### version 0.7.0
+#### version 2.0.0
 
 ## Summary
 Smart Reference is a Unity plugin that allows you to lazy load references to other objects in ScriptableObject and MonoBehaviour.

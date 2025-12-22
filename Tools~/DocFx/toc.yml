@@ -1,5 +1,21 @@
 items:
-- name: Quick Start
-  href: index.md
-- name: API Documentation
-  href: api/
+  - name: Manual
+    items:
+      - name: Smart Reference 2.0
+        href: index.md
+    
+      - name: Initialization
+        href: docs/init.md
+    
+      - name: Loading Assets
+        items:
+          - name: Synchronous Loading
+            href: docs/loading_sync.md
+          - name: Asynchronous Loading
+            href: docs/loading_async.md
+    
+      - name: Custom Loader
+        href: docs/custom_loader.md
+    
+  - name: API Documentation
+    href: api/
