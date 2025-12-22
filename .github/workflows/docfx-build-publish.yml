@@ -72,6 +72,7 @@ jobs:
         uses: actions/download-artifact@v7.0.0
         with:
           name: _site
+          path: _site
           
       - name: Display structure of downloaded files
         run: ls -R
@@ -81,7 +82,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages-test
-          publish_dir: ./
+          publish_dir: _site
           force_orphan: true
           
   deploy:
