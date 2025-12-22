@@ -72,13 +72,16 @@ jobs:
         uses: actions/download-artifact@v7.0.0
         with:
           name: _site
+          
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Publish
         uses: peaceiris/actions-gh-pages@v4.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages-test
-#          publish_dir: _site
+          publish_dir: ./
           force_orphan: true
           
   deploy:
