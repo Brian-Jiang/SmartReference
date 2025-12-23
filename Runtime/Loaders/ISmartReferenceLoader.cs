@@ -23,8 +23,7 @@ namespace SmartReference.Runtime
         public ISmartReferenceHandle LoadAsync(string path, Type type, Action<Object> callback);
         
         /// <summary>
-        /// Release an asset/handle created by this loader.
-        /// If handle is null, loader may optionally attempt to release by asset reference.
+        /// Release an asset/handle created by this loader using the provided handle.
         /// </summary>
         /// <param name="handle">The handle returned by `LoadAsync`.</param>
         void Release(ISmartReferenceHandle handle);

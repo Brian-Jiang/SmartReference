@@ -38,61 +38,33 @@ namespace SmartReference.Runtime
             if (string.IsNullOrEmpty(path))
                 return path;
 
-            // Normalize slashes so Windows paths work.
+            // Normalize slashes for Windows paths
             var p = path.Replace('\\', '/');
+
             const string segment = "/Resources/";
-            var idx = p.LastIndexOf(segment, StringComparison.OrdinalIgnoreCase);
+            var idx = p.IndexOf(segment, StringComparison.OrdinalIgnoreCase);
             if (idx < 0)
             {
-                const string segmentNoSlash = "/Resources";
-                var idx2 = p.LastIndexOf(segmentNoSlash, StringComparison.OrdinalIgnoreCase);
-                if (idx2 >= 0)
-                {
-                    var next = idx2 + segmentNoSlash.Length;
-                    if (next == p.Length)
-                    {
-                        Debug.LogError($"[SmartReference] ResourcesLoader: Path points to Resources folder, not an asset: {path}");
-                        return StripExtension(p);
-                    }
-                    
-                    if (p[next] == '/')
-                    {
-                        idx = idx2;
-                    }
-                }
+                Debug.LogError($"[SmartReference] ResourcesLoader: Path does not contain '/Resources/': {path}");
+                return StripExtension(p);
             }
 
-            string relative;
-            if (idx >= 0)
+            var start = idx + segment.Length;
+            if (start >= p.Length)
             {
-                var start = idx + segment.Length;
-                if (start >= p.Length)
-                {
-                    Debug.LogError($"[SmartReference] ResourcesLoader: Path points to Resources folder, not an asset: {path}");
-                    return StripExtension(p);
-                }
-
-                relative = p.Substring(start);
-            }
-            else
-            {
-                Debug.LogWarning($"[SmartReference] ResourcesLoader: Path '{path}' does not contain a Resources folder segment.");
-                relative = p;
+                Debug.LogError($"[SmartReference] ResourcesLoader: Path points to Resources folder, not an asset: {path}");
+                return StripExtension(p);
             }
 
+            var relative = p.Substring(start);
             return StripExtension(relative);
         }
 
-        private static string StripExtension(string s)
+        private static string StripExtension(string path)
         {
-            var slash = s.LastIndexOf('/');
-            var dot = s.LastIndexOf('.');
-            if (dot > slash)
-            {
-                return s.Substring(0, dot);
-            }
-            
-            return s;
+            var slashIndex = path.LastIndexOf('/');
+            var dotIndex = path.LastIndexOf('.');
+            return (dotIndex > slashIndex) ? path.Substring(0, dotIndex) : path;
         }
     }
 }

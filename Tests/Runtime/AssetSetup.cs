@@ -22,9 +22,9 @@ namespace SmartReference.Runtime.Tests
 
         // Resources.Load path (relative to any Resources folder)
         public const string SoResourcesPath = SoAssetPath;
-        public const string TextureResourcesPath = "SmartReferenceTest/TestTex";
+        public const string TextureResourcesPath = TextureAssetPath;
         public const string MaterialResourcesPath = "SmartReferenceTest/TestMat";
-        public const string PrefabResourcesPath = "SmartReferenceTest/TestPrefab";
+        public const string PrefabResourcesPath = PrefabAssetPath;
 
         public static void Setup()
         {

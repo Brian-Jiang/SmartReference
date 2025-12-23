@@ -137,7 +137,6 @@ namespace SmartReference.Runtime
         {
             if (value != null)
             {
-                OnAsyncLoadComplete?.Invoke(value);
                 return;
             }
 
@@ -288,7 +287,7 @@ namespace SmartReference.Runtime
         
         private void CompleteInFlight(T result)
         {
-            OnAsyncLoadComplete?.Invoke(value);
+            OnAsyncLoadComplete?.Invoke(result);
             
             // Task
             if (inFlightTaskTcs != null)

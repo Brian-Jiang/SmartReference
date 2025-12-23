@@ -34,11 +34,10 @@ namespace SmartReference.Runtime
             var handle = Addressables.LoadAssetAsync<Object>(path);
             handle.Completed += operation =>
             {
-                if (operation.Status == AsyncOperationStatus.Succeeded)
-                {
-                    callback?.Invoke(operation.Result);
-                }
+                var result = operation.Status == AsyncOperationStatus.Succeeded ? operation.Result : null;
+                callback?.Invoke(result);
             };
+            
             var h = new AddressablesHandle { op = handle };
             return h;
         }
