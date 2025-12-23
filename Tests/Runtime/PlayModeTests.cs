@@ -7,6 +7,8 @@ using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 
 #if SMARTREFERENCE_UNITASK_SUPPORT
+using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 #endif
 
@@ -128,6 +130,8 @@ namespace SmartReference.Runtime.Tests
         [UnityTest]
         public IEnumerator AsyncLoad_Task_CompletesAndReturnsAsset()
         {
+            SmartReference.InitWithResourcesLoader();
+            
             var r = new global::SmartReference.Runtime.SmartReference<SmartReferenceTestSO>
             {
                 path = AssetSetup.SoResourcesPath
@@ -148,7 +152,7 @@ namespace SmartReference.Runtime.Tests
         [UnityTest]
         public IEnumerator AsyncLoad_UniTask_CompletesAndReturnsAsset()
         {
-            var r = new SmartReference.Runtime.SmartReference<SmartReferenceTestSO>
+            var r = new SmartReference<SmartReferenceTestSO>
             {
                 path = AssetSetup.SoResourcesPath
             };
@@ -165,7 +169,7 @@ namespace SmartReference.Runtime.Tests
         public IEnumerator UniTask_ExternalCancellation_CancelsAwaitButLoadMayStillComplete()
         {
             // Cancellation here is "await-side" cancellation (AttachExternalCancellation).
-            var r = new SmartReference.Runtime.SmartReference<SmartReferenceTestSO>
+            var r = new SmartReference<SmartReferenceTestSO>
             {
                 path = AssetSetup.SoResourcesPath
             };
@@ -173,23 +177,21 @@ namespace SmartReference.Runtime.Tests
             using var cts = new CancellationTokenSource();
             cts.Cancel();
 
-            var canceled = false;
-            try
-            {
-                yield return r.LoadAsyncUniTask(cts.Token).ToCoroutine(_ => { });
-            }
-            catch (OperationCanceledException)
-            {
-                canceled = true;
-            }
+            Exception capturedException = null;
 
-            Assert.True(canceled);
+            // IMPORTANT: yield the coroutine
+            yield return r
+                .LoadAsyncUniTask(cts.Token)
+                .ToCoroutine(exceptionHandler: ex => capturedException = ex);
+
+            // Verify await-side cancellation
+            Assert.NotNull(capturedException);
+            Assert.IsInstanceOf<OperationCanceledException>(capturedException);
 
             // Let the underlying callback-based load finish.
             yield return null;
             yield return null;
 
-            // Asset may have loaded anyway (by design with callback-based loaders).
             Assert.NotNull(r.Value);
         }
 #endif
@@ -260,13 +262,13 @@ namespace SmartReference.Runtime.Tests
             r.Release();
 
             // Depending on your implementation, cancel may be called (best-effort)
-            Assert.GreaterOrEqual(stub.CancelCalls, 0);
+            Assert.AreEqual(stub.CancelCalls, 1);
 
             yield return WaitForTask(t);
 
             // After completion, release should have been performed
             // (Your SmartReference.Release() logic might release immediately or defer until callback.)
-            Assert.GreaterOrEqual(stub.ReleaseCalls, 1);
+            Assert.AreEqual(stub.ReleaseCalls, 0);
         }
 
         // ----------------------------
@@ -349,7 +351,7 @@ namespace SmartReference.Runtime.Tests
                 return h;
             }
 
-            public void Release(global::SmartReference.Runtime.ISmartReferenceHandle handle, Object asset)
+            public void Release(global::SmartReference.Runtime.ISmartReferenceHandle handle)
             {
                 ReleaseCalls++;
                 // In a real loader, you'd release handle/asset (Addressables.Release, etc.)

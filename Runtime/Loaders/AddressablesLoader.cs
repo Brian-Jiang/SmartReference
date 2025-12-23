@@ -13,8 +13,10 @@ namespace SmartReference.Runtime
         {
             Object result = null;
             var handle = Addressables.LoadAssetAsync<Object>(path);
-            handle.Completed += operation => {
-                if (operation.Status == AsyncOperationStatus.Succeeded) {
+            handle.Completed += operation =>
+            {
+                if (operation.Status == AsyncOperationStatus.Succeeded)
+                {
                     result = operation.Result;
                 }
             };
@@ -30,38 +32,28 @@ namespace SmartReference.Runtime
         public ISmartReferenceHandle LoadAsync(string path, Type type, Action<Object> callback)
         {
             var handle = Addressables.LoadAssetAsync<Object>(path);
-            handle.Completed += operation => {
-                if (operation.Status == AsyncOperationStatus.Succeeded) {
+            handle.Completed += operation =>
+            {
+                if (operation.Status == AsyncOperationStatus.Succeeded)
+                {
                     callback?.Invoke(operation.Result);
                 }
             };
-            var h = new AddressablesHandle { Op = handle };
+            var h = new AddressablesHandle { op = handle };
             return h;
         }
 
-        public void Release(ISmartReferenceHandle handle, UnityEngine.Object asset)
+        public void Release(ISmartReferenceHandle handle)
         {
-            if (handle is AddressablesHandle ah && ah.IsValid)
+            if (handle is AddressablesHandle { IsValid: true } addressablesHandle)
             {
-                Addressables.Release(ah.Op);
-                return;
-            }
-
-            // fallback (less ideal): if someone passed only asset
-            if (asset != null)
-            {
-                Addressables.Release(asset);
+                Addressables.Release(addressablesHandle.op);
             }
         }
 
         public void Cancel(ISmartReferenceHandle handle)
         {
-            // Addressables doesn't truly "cancel" loads the same way; you can release handle
-            // but behavior depends on ref counting/state. We'll best-effort release op if valid.
-            // if (handle is AddressablesHandle ah && ah.IsValid)
-            // {
-            //     Addressables.Release(ah.Op);
-            // }
+            
         }
     }
 }

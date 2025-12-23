@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 #if SMARTREFERENCE_UNITASK_SUPPORT
+using System.Threading;
 using Cysharp.Threading.Tasks;
 #endif
 
@@ -43,6 +43,10 @@ namespace SmartReference.Runtime
         }
 #endif
         
+        /// <summary>
+        /// Use this method to initialize the loader with a custom implementation of ISmartReferenceLoader.
+        /// </summary>
+        /// <param name="loader">The custom loader implementation.</param>
         public static void InitWithCustomLoader(ISmartReferenceLoader loader)
         {
             Loader = loader;
@@ -52,10 +56,14 @@ namespace SmartReference.Runtime
     }
     
     [Serializable]
-    public class SmartReference<T>: SmartReference, ISerializationCallbackReceiver where T: Object
+    public class SmartReference<T>: SmartReference, ISerializationCallbackReceiver
+        where T: Object
     {
         [NonSerialized] private T value;
         
+        /// <summary>
+        /// Event invoked when the asynchronous load is complete.
+        /// </summary>
         public event Action<T> OnAsyncLoadComplete; 
         
         [NonSerialized] private bool isLoading;
@@ -64,16 +72,23 @@ namespace SmartReference.Runtime
         [NonSerialized] private UniTaskCompletionSource<T> inFlightUniTaskTcs;
 #endif
         
-        // NEW: track loader handle for release/cancel.
         [NonSerialized] private ISmartReferenceHandle handle;
-
-        // NEW: if disposed while loading, we’ll release after completion.
         [NonSerialized] private bool releaseRequested;
         
+        /// <summary>
+        /// Check if the asset is loaded.
+        /// </summary>
         public bool IsLoaded => value != null;
+        
+        /// <summary>
+        /// Check if the asset is loading asynchronously.
+        /// </summary>
         public bool IsLoading => isLoading;
+        
+        /// <summary>
+        /// Check if a release has been requested while loading.
+        /// </summary>
         public bool ReleaseRequested => releaseRequested;
-
 
         /// <summary>
         /// Get the asset. If the asset is not loaded, it will be loaded automatically.
@@ -116,7 +131,7 @@ namespace SmartReference.Runtime
         }
         
         /// <summary>
-        /// Call this method to load the asset asynchronously. Useful if you want to preload the asset.
+        /// Call this method to load the asset asynchronously. You can subscribe to the OnAsyncLoadComplete event to get notified when the load is complete.
         /// </summary>
         public void LoadAsync()
         {
@@ -138,7 +153,7 @@ namespace SmartReference.Runtime
                 return;
             }
 
-            // If already loading, do nothing (caller can subscribe to event or await task/unitask).
+            // If already loading, do nothing
             if (isLoading) return;
 
             isLoading = true;
@@ -147,7 +162,7 @@ namespace SmartReference.Runtime
         }
         
         /// <summary>
-        /// Load the asset asynchronously with async/await.
+        /// Load the asset asynchronously with C# async/await.
         /// </summary>
         public Task<T> LoadAsyncTask()
         {
@@ -168,14 +183,13 @@ namespace SmartReference.Runtime
                 return Task.FromResult<T>(null);
             }
 
-            // Share the same in-flight request.
             if (inFlightTaskTcs != null)
             {
                 return inFlightTaskTcs.Task;
             }
 
             inFlightTaskTcs = new TaskCompletionSource<T>();
-            LoadAsync(); // will complete TCS via CompleteInFlight(...)
+            LoadAsync();
             return inFlightTaskTcs.Task;
         }
         
@@ -190,9 +204,7 @@ namespace SmartReference.Runtime
         }
 
         /// <summary>
-        /// Load the asset asynchronously with UniTask + cancellation token.
-        /// Note: since your loader is callback-based, cancellation here only cancels the awaiting side.
-        /// If you want true cancel (e.g., Addressables handle release), extend ISmartReferenceLoader to support it.
+        /// Load the asset asynchronously with UniTask and cancellation token.
         /// </summary>
         public UniTask<T> LoadAsyncUniTask(CancellationToken cancellationToken)
         {
@@ -213,34 +225,31 @@ namespace SmartReference.Runtime
                 return UniTask.FromResult<T>(null);
             }
 
-            // Share in-flight request.
             if (inFlightUniTaskTcs != null)
             {
                 return inFlightUniTaskTcs.Task.AttachExternalCancellation(cancellationToken);
             }
 
             inFlightUniTaskTcs = new UniTaskCompletionSource<T>();
-            LoadAsync(); // will complete UniTask TCS via CompleteInFlight(...)
+            LoadAsync();
             return inFlightUniTaskTcs.Task.AttachExternalCancellation(cancellationToken);
         }
         
 #endif
         
         /// <summary>
-        /// NEW: Release/unload the loaded asset (and any loader handle).
+        /// Release the loaded asset.
         /// Safe to call multiple times.
-        /// If called during loading, attempts cancel + releases upon completion (best-effort).
+        /// If called during loading, attempts cancel the loading.
         /// </summary>
         public void Release()
         {
-            // if no loader, just clear references
             if (Loader == null)
             {
                 LogEmptyLoaderError();
                 return;
             }
 
-            // If loading, request release; try cancel if supported.
             if (isLoading)
             {
                 releaseRequested = true;
@@ -252,6 +261,7 @@ namespace SmartReference.Runtime
                 {
                     Debug.LogWarning($"[SmartReference] Cancel loading failed for asset at path: {path}. Exception: {e}");
                 }
+                
                 return;
             }
 
@@ -262,7 +272,7 @@ namespace SmartReference.Runtime
 
             try
             {
-                Loader.Release(handle, value);
+                Loader.Release(handle);
             }
             catch (Exception e)
             {
@@ -305,6 +315,8 @@ namespace SmartReference.Runtime
             if (obj == null)
             {
                 CompleteInFlight(null);
+                if (releaseRequested) return;
+                
                 LogLoadAssetNullError();
                 return;
             }
@@ -312,7 +324,7 @@ namespace SmartReference.Runtime
             value = (T) obj;
             CompleteInFlight(value);
             
-            // If Dispose/Release was called during loading, release immediately after completion.
+            // If Release was called during loading, release immediately after completion.
             if (releaseRequested)
             {
                 Release();
@@ -334,11 +346,13 @@ namespace SmartReference.Runtime
             Debug.LogError($"[SmartReference] Loaded asset is null, path: {path}");
         }
 
-        public void OnBeforeSerialize() {
+        public void OnBeforeSerialize()
+        {
             type = typeof(T).AssemblyQualifiedName;
         }
 
-        public void OnAfterDeserialize() {
+        public void OnAfterDeserialize()
+        {
             
         }
     }
