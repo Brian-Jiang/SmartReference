@@ -7,8 +7,10 @@ using Object = UnityEngine.Object;
 
 namespace SmartReference.Runtime
 {
-    public class AddressablesLoader: ISmartReferenceLoader {
-        public Object Load(string path, Type type) {
+    public class AddressablesLoader: ISmartReferenceLoader
+    {
+        public Object Load(string path, Type type)
+        {
             Object result = null;
             var handle = Addressables.LoadAssetAsync<Object>(path);
             handle.Completed += operation => {
@@ -19,6 +21,8 @@ namespace SmartReference.Runtime
             
 #if !UNITY_WEBGL
             handle.WaitForCompletion();
+#else
+            UnityEngine.Debug.LogError("AddressablesLoader.Load called in WebGL build; synchronous loading is not supported. Consider using LoadAsync instead.");
 #endif
             return result;
         }

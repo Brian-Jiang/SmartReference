@@ -78,7 +78,8 @@ namespace SmartReference.Runtime
         /// <summary>
         /// Get the asset. If the asset is not loaded, it will be loaded automatically.
         /// </summary>
-        public T Value {
+        public T Value
+        {
             get {
                 if (value == null) {
                     Load();
@@ -95,7 +96,8 @@ namespace SmartReference.Runtime
         /// <summary>
         /// Call this method to load the asset. This would be called automatically when you access the Value property.
         /// </summary>
-        public void Load() {
+        public void Load()
+        {
             if (string.IsNullOrEmpty(path))
             {
                 LogEmptyAssetError();

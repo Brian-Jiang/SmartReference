@@ -12,7 +12,8 @@
             "dest": "api",
             "filter": "filterConfig.yml",
             "disableGitFeatures": false,
-            "disableDefaultFilter": false
+            "disableDefaultFilter": false,
+            "allowCompilationErrors": true,
         }
     ],
     "build": {
@@ -46,7 +47,8 @@
             }
         ],
         "xref": [
-            "https://normanderwan.github.io/UnityXrefMaps/xrefmap.yml"
+            "https://normanderwan.github.io/UnityXrefMaps/xrefmap.yml",
+            "https://docs.microsoft.com/dotnet/xrefmap.yml"
         ],
         "xrefService": [
             "https://xref.docs.microsoft.com/query?uid={uid}"

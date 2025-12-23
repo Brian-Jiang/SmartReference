@@ -30,10 +30,13 @@ jobs:
         with:
           dotnet-version: '8.0.x'
           
+#      - name: Setup DocFX
+#        uses: crazy-max/ghaction-chocolatey@v3.4.0
+#        with:
+#          args: install docfx --ignore-checksums
+          
       - name: Setup DocFX
-        uses: crazy-max/ghaction-chocolatey@v3.4.0
-        with:
-          args: install docfx --ignore-checksums
+        run: dotnet tool install -g docfx --version 2.61.0
           
       - name: Copy readme
         run: cp .\README.md .\Tools~\DocFx\index.md

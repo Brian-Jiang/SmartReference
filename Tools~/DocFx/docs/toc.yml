@@ -8,6 +8,9 @@
         href: loading_sync.md
       - name: Asynchronous Loading
         href: loading_async.md
+  
+  - name: Releasing Assets
+    href: releasing.md
 
   - name: Custom Loader
     href: custom_loader.md
