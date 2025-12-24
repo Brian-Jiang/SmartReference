@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Loading Assets Synchronously | Smart Reference </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Loading Assets Synchronously | Smart Reference ">
+    
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="loading-assets-synchronously">Loading Assets Synchronously</h1>
+
+<p>Synchronous loading blocks execution until the referenced asset is fully loaded and available.</p>
+<p>This is the simplest loading method, but it should be used carefully, especially at runtime.</p>
+<hr>
+<h2 id="basic-sync-load">Basic Sync Load</h2>
+<pre><code class="lang-csharp">using UnityEngine;
+using SmartReference.Runtime;
+
+public class SyncLoadExample : MonoBehaviour
+{
+    [SerializeField] private SmartReference&lt;Texture2D&gt; icon;
+    [SerializeField] private SmartReference&lt;GameObject&gt; prefab;
+
+    void Start()
+    {
+        var texture = icon.Load();
+
+        var instance = Instantiate(prefab);
+    }
+}
+</code></pre>
+<p>When Load() is called, Smart Reference delegates the request to the active loader and blocks until the asset is available.</p>
+<h2 id="when-to-use-synchronous-loading">When to Use Synchronous Loading</h2>
+<p>Synchronous loading is appropriate when loading cost is negligible or when blocking is acceptable. Typical use cases include early initialization code, and small assets such as icons or configuration data.</p>
+<p>For larger assets or frequently executed code paths, asynchronous loading is strongly recommended to avoid frame stalls and maintain responsiveness.</p>
+<h2 id="loader-behavior">Loader Behavior</h2>
+<p>The exact behavior of synchronous loading depends on the active loader:</p>
+<ul>
+<li>The Resources loader performs a direct <code>Resources.Load</code>.</li>
+<li>The Addressables loader calls <code>handle.WaitForCompletion()</code> internally to block while waiting for an async operation.</li>
+<li>Custom loaders define their own synchronous behavior.</li>
+</ul>
+<h2 id="webgl-considerations">WebGL Considerations</h2>
+<p>WebGL runs on a single-threaded execution model.
+When using the Addressables loader, synchronous loading is not supported on WebGL platforms and will return an empty load result.</p>
+<p>For WebGL builds, always use asynchronous loading.</p>
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/Brian-Jiang/SmartReference/blob/main/Tools~/DocFx/docs/loading_sync.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Smart Reference
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

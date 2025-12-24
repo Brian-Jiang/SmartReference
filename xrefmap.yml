@@ -1,0 +1,479 @@
+### YamlMime:XRefMap
+sorted: true
+references:
+- uid: SmartReference.Runtime
+  name: SmartReference.Runtime
+  href: api/SmartReference.Runtime.html
+  commentId: N:SmartReference.Runtime
+  fullName: SmartReference.Runtime
+  nameWithType: SmartReference.Runtime
+- uid: SmartReference.Runtime.ISmartReferenceHandle
+  name: ISmartReferenceHandle
+  href: api/SmartReference.Runtime.ISmartReferenceHandle.html
+  commentId: T:SmartReference.Runtime.ISmartReferenceHandle
+  fullName: SmartReference.Runtime.ISmartReferenceHandle
+  nameWithType: ISmartReferenceHandle
+- uid: SmartReference.Runtime.ISmartReferenceLoader
+  name: ISmartReferenceLoader
+  href: api/SmartReference.Runtime.ISmartReferenceLoader.html
+  commentId: T:SmartReference.Runtime.ISmartReferenceLoader
+  fullName: SmartReference.Runtime.ISmartReferenceLoader
+  nameWithType: ISmartReferenceLoader
+- uid: SmartReference.Runtime.ISmartReferenceLoader.Cancel(SmartReference.Runtime.ISmartReferenceHandle)
+  name: Cancel(ISmartReferenceHandle)
+  href: api/SmartReference.Runtime.ISmartReferenceLoader.html#SmartReference_Runtime_ISmartReferenceLoader_Cancel_SmartReference_Runtime_ISmartReferenceHandle_
+  commentId: M:SmartReference.Runtime.ISmartReferenceLoader.Cancel(SmartReference.Runtime.ISmartReferenceHandle)
+  fullName: SmartReference.Runtime.ISmartReferenceLoader.Cancel(SmartReference.Runtime.ISmartReferenceHandle)
+  nameWithType: ISmartReferenceLoader.Cancel(ISmartReferenceHandle)
+- uid: SmartReference.Runtime.ISmartReferenceLoader.Cancel*
+  name: Cancel
+  href: api/SmartReference.Runtime.ISmartReferenceLoader.html#SmartReference_Runtime_ISmartReferenceLoader_Cancel_
+  commentId: Overload:SmartReference.Runtime.ISmartReferenceLoader.Cancel
+  isSpec: "True"
+  fullName: SmartReference.Runtime.ISmartReferenceLoader.Cancel
+  nameWithType: ISmartReferenceLoader.Cancel
+- uid: SmartReference.Runtime.ISmartReferenceLoader.Load(System.String,System.Type,System.Object@)
+  name: Load(string, Type, out object)
+  href: api/SmartReference.Runtime.ISmartReferenceLoader.html#SmartReference_Runtime_ISmartReferenceLoader_Load_System_String_System_Type_System_Object__
+  commentId: M:SmartReference.Runtime.ISmartReferenceLoader.Load(System.String,System.Type,System.Object@)
+  name.vb: Load(String, Type, Object)
+  fullName: SmartReference.Runtime.ISmartReferenceLoader.Load(string, System.Type, out object)
+  fullName.vb: SmartReference.Runtime.ISmartReferenceLoader.Load(String, System.Type, Object)
+  nameWithType: ISmartReferenceLoader.Load(string, Type, out object)
+  nameWithType.vb: ISmartReferenceLoader.Load(String, Type, Object)
+- uid: SmartReference.Runtime.ISmartReferenceLoader.Load*
+  name: Load
+  href: api/SmartReference.Runtime.ISmartReferenceLoader.html#SmartReference_Runtime_ISmartReferenceLoader_Load_
+  commentId: Overload:SmartReference.Runtime.ISmartReferenceLoader.Load
+  isSpec: "True"
+  fullName: SmartReference.Runtime.ISmartReferenceLoader.Load
+  nameWithType: ISmartReferenceLoader.Load
+- uid: SmartReference.Runtime.ISmartReferenceLoader.LoadAsync(System.String,System.Type,System.Action{System.Object})
+  name: LoadAsync(string, Type, Action<object>)
+  href: api/SmartReference.Runtime.ISmartReferenceLoader.html#SmartReference_Runtime_ISmartReferenceLoader_LoadAsync_System_String_System_Type_System_Action_System_Object__
+  commentId: M:SmartReference.Runtime.ISmartReferenceLoader.LoadAsync(System.String,System.Type,System.Action{System.Object})
+  name.vb: LoadAsync(String, Type, Action(Of Object))
+  fullName: SmartReference.Runtime.ISmartReferenceLoader.LoadAsync(string, System.Type, System.Action<object>)
+  fullName.vb: SmartReference.Runtime.ISmartReferenceLoader.LoadAsync(String, System.Type, System.Action(Of Object))
+  nameWithType: ISmartReferenceLoader.LoadAsync(string, Type, Action<object>)
+  nameWithType.vb: ISmartReferenceLoader.LoadAsync(String, Type, Action(Of Object))
+- uid: SmartReference.Runtime.ISmartReferenceLoader.LoadAsync*
+  name: LoadAsync
+  href: api/SmartReference.Runtime.ISmartReferenceLoader.html#SmartReference_Runtime_ISmartReferenceLoader_LoadAsync_
+  commentId: Overload:SmartReference.Runtime.ISmartReferenceLoader.LoadAsync
+  isSpec: "True"
+  fullName: SmartReference.Runtime.ISmartReferenceLoader.LoadAsync
+  nameWithType: ISmartReferenceLoader.LoadAsync
+- uid: SmartReference.Runtime.ISmartReferenceLoader.Release(SmartReference.Runtime.ISmartReferenceHandle)
+  name: Release(ISmartReferenceHandle)
+  href: api/SmartReference.Runtime.ISmartReferenceLoader.html#SmartReference_Runtime_ISmartReferenceLoader_Release_SmartReference_Runtime_ISmartReferenceHandle_
+  commentId: M:SmartReference.Runtime.ISmartReferenceLoader.Release(SmartReference.Runtime.ISmartReferenceHandle)
+  fullName: SmartReference.Runtime.ISmartReferenceLoader.Release(SmartReference.Runtime.ISmartReferenceHandle)
+  nameWithType: ISmartReferenceLoader.Release(ISmartReferenceHandle)
+- uid: SmartReference.Runtime.ISmartReferenceLoader.Release*
+  name: Release
+  href: api/SmartReference.Runtime.ISmartReferenceLoader.html#SmartReference_Runtime_ISmartReferenceLoader_Release_
+  commentId: Overload:SmartReference.Runtime.ISmartReferenceLoader.Release
+  isSpec: "True"
+  fullName: SmartReference.Runtime.ISmartReferenceLoader.Release
+  nameWithType: ISmartReferenceLoader.Release
+- uid: SmartReference.Runtime.ResourcesHandle
+  name: ResourcesHandle
+  href: api/SmartReference.Runtime.ResourcesHandle.html
+  commentId: T:SmartReference.Runtime.ResourcesHandle
+  fullName: SmartReference.Runtime.ResourcesHandle
+  nameWithType: ResourcesHandle
+- uid: SmartReference.Runtime.ResourcesHandle.loadedObject
+  name: loadedObject
+  href: api/SmartReference.Runtime.ResourcesHandle.html#SmartReference_Runtime_ResourcesHandle_loadedObject
+  commentId: F:SmartReference.Runtime.ResourcesHandle.loadedObject
+  fullName: SmartReference.Runtime.ResourcesHandle.loadedObject
+  nameWithType: ResourcesHandle.loadedObject
+- uid: SmartReference.Runtime.ResourcesHandle.request
+  name: request
+  href: api/SmartReference.Runtime.ResourcesHandle.html#SmartReference_Runtime_ResourcesHandle_request
+  commentId: F:SmartReference.Runtime.ResourcesHandle.request
+  fullName: SmartReference.Runtime.ResourcesHandle.request
+  nameWithType: ResourcesHandle.request
+- uid: SmartReference.Runtime.ResourcesLoader
+  name: ResourcesLoader
+  href: api/SmartReference.Runtime.ResourcesLoader.html
+  commentId: T:SmartReference.Runtime.ResourcesLoader
+  fullName: SmartReference.Runtime.ResourcesLoader
+  nameWithType: ResourcesLoader
+- uid: SmartReference.Runtime.ResourcesLoader.Cancel(SmartReference.Runtime.ISmartReferenceHandle)
+  name: Cancel(ISmartReferenceHandle)
+  href: api/SmartReference.Runtime.ResourcesLoader.html#SmartReference_Runtime_ResourcesLoader_Cancel_SmartReference_Runtime_ISmartReferenceHandle_
+  commentId: M:SmartReference.Runtime.ResourcesLoader.Cancel(SmartReference.Runtime.ISmartReferenceHandle)
+  fullName: SmartReference.Runtime.ResourcesLoader.Cancel(SmartReference.Runtime.ISmartReferenceHandle)
+  nameWithType: ResourcesLoader.Cancel(ISmartReferenceHandle)
+- uid: SmartReference.Runtime.ResourcesLoader.Cancel*
+  name: Cancel
+  href: api/SmartReference.Runtime.ResourcesLoader.html#SmartReference_Runtime_ResourcesLoader_Cancel_
+  commentId: Overload:SmartReference.Runtime.ResourcesLoader.Cancel
+  isSpec: "True"
+  fullName: SmartReference.Runtime.ResourcesLoader.Cancel
+  nameWithType: ResourcesLoader.Cancel
+- uid: SmartReference.Runtime.ResourcesLoader.Load(System.String,System.Type,System.Object@)
+  name: Load(string, Type, out object)
+  href: api/SmartReference.Runtime.ResourcesLoader.html#SmartReference_Runtime_ResourcesLoader_Load_System_String_System_Type_System_Object__
+  commentId: M:SmartReference.Runtime.ResourcesLoader.Load(System.String,System.Type,System.Object@)
+  name.vb: Load(String, Type, Object)
+  fullName: SmartReference.Runtime.ResourcesLoader.Load(string, System.Type, out object)
+  fullName.vb: SmartReference.Runtime.ResourcesLoader.Load(String, System.Type, Object)
+  nameWithType: ResourcesLoader.Load(string, Type, out object)
+  nameWithType.vb: ResourcesLoader.Load(String, Type, Object)
+- uid: SmartReference.Runtime.ResourcesLoader.Load*
+  name: Load
+  href: api/SmartReference.Runtime.ResourcesLoader.html#SmartReference_Runtime_ResourcesLoader_Load_
+  commentId: Overload:SmartReference.Runtime.ResourcesLoader.Load
+  isSpec: "True"
+  fullName: SmartReference.Runtime.ResourcesLoader.Load
+  nameWithType: ResourcesLoader.Load
+- uid: SmartReference.Runtime.ResourcesLoader.LoadAsync(System.String,System.Type,System.Action{System.Object})
+  name: LoadAsync(string, Type, Action<object>)
+  href: api/SmartReference.Runtime.ResourcesLoader.html#SmartReference_Runtime_ResourcesLoader_LoadAsync_System_String_System_Type_System_Action_System_Object__
+  commentId: M:SmartReference.Runtime.ResourcesLoader.LoadAsync(System.String,System.Type,System.Action{System.Object})
+  name.vb: LoadAsync(String, Type, Action(Of Object))
+  fullName: SmartReference.Runtime.ResourcesLoader.LoadAsync(string, System.Type, System.Action<object>)
+  fullName.vb: SmartReference.Runtime.ResourcesLoader.LoadAsync(String, System.Type, System.Action(Of Object))
+  nameWithType: ResourcesLoader.LoadAsync(string, Type, Action<object>)
+  nameWithType.vb: ResourcesLoader.LoadAsync(String, Type, Action(Of Object))
+- uid: SmartReference.Runtime.ResourcesLoader.LoadAsync*
+  name: LoadAsync
+  href: api/SmartReference.Runtime.ResourcesLoader.html#SmartReference_Runtime_ResourcesLoader_LoadAsync_
+  commentId: Overload:SmartReference.Runtime.ResourcesLoader.LoadAsync
+  isSpec: "True"
+  fullName: SmartReference.Runtime.ResourcesLoader.LoadAsync
+  nameWithType: ResourcesLoader.LoadAsync
+- uid: SmartReference.Runtime.ResourcesLoader.Release(SmartReference.Runtime.ISmartReferenceHandle)
+  name: Release(ISmartReferenceHandle)
+  href: api/SmartReference.Runtime.ResourcesLoader.html#SmartReference_Runtime_ResourcesLoader_Release_SmartReference_Runtime_ISmartReferenceHandle_
+  commentId: M:SmartReference.Runtime.ResourcesLoader.Release(SmartReference.Runtime.ISmartReferenceHandle)
+  fullName: SmartReference.Runtime.ResourcesLoader.Release(SmartReference.Runtime.ISmartReferenceHandle)
+  nameWithType: ResourcesLoader.Release(ISmartReferenceHandle)
+- uid: SmartReference.Runtime.ResourcesLoader.Release*
+  name: Release
+  href: api/SmartReference.Runtime.ResourcesLoader.html#SmartReference_Runtime_ResourcesLoader_Release_
+  commentId: Overload:SmartReference.Runtime.ResourcesLoader.Release
+  isSpec: "True"
+  fullName: SmartReference.Runtime.ResourcesLoader.Release
+  nameWithType: ResourcesLoader.Release
+- uid: SmartReference.Runtime.SceneReference
+  name: SceneReference
+  href: api/SmartReference.Runtime.SceneReference.html
+  commentId: T:SmartReference.Runtime.SceneReference
+  fullName: SmartReference.Runtime.SceneReference
+  nameWithType: SceneReference
+- uid: SmartReference.Runtime.SceneReference.op_Implicit(SmartReference.Runtime.SceneReference)~System.String
+  name: implicit operator string(SceneReference)
+  href: api/SmartReference.Runtime.SceneReference.html#SmartReference_Runtime_SceneReference_op_Implicit_SmartReference_Runtime_SceneReference__System_String
+  commentId: M:SmartReference.Runtime.SceneReference.op_Implicit(SmartReference.Runtime.SceneReference)~System.String
+  name.vb: CType(SceneReference)
+  fullName: SmartReference.Runtime.SceneReference.implicit operator string(SmartReference.Runtime.SceneReference)
+  fullName.vb: SmartReference.Runtime.SceneReference.CType(SmartReference.Runtime.SceneReference)
+  nameWithType: SceneReference.implicit operator string(SceneReference)
+  nameWithType.vb: SceneReference.CType(SceneReference)
+- uid: SmartReference.Runtime.SceneReference.op_Implicit*
+  name: implicit operator string
+  href: api/SmartReference.Runtime.SceneReference.html#SmartReference_Runtime_SceneReference_op_Implicit_
+  commentId: Overload:SmartReference.Runtime.SceneReference.op_Implicit
+  name.vb: CType
+  fullName: SmartReference.Runtime.SceneReference.implicit operator string
+  fullName.vb: SmartReference.Runtime.SceneReference.CType
+  nameWithType: SceneReference.implicit operator string
+  nameWithType.vb: SceneReference.CType
+- uid: SmartReference.Runtime.SceneReference.ScenePath
+  name: ScenePath
+  href: api/SmartReference.Runtime.SceneReference.html#SmartReference_Runtime_SceneReference_ScenePath
+  commentId: P:SmartReference.Runtime.SceneReference.ScenePath
+  fullName: SmartReference.Runtime.SceneReference.ScenePath
+  nameWithType: SceneReference.ScenePath
+- uid: SmartReference.Runtime.SceneReference.ScenePath*
+  name: ScenePath
+  href: api/SmartReference.Runtime.SceneReference.html#SmartReference_Runtime_SceneReference_ScenePath_
+  commentId: Overload:SmartReference.Runtime.SceneReference.ScenePath
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SceneReference.ScenePath
+  nameWithType: SceneReference.ScenePath
+- uid: SmartReference.Runtime.SceneReference.ToString
+  name: ToString()
+  href: api/SmartReference.Runtime.SceneReference.html#SmartReference_Runtime_SceneReference_ToString
+  commentId: M:SmartReference.Runtime.SceneReference.ToString
+  fullName: SmartReference.Runtime.SceneReference.ToString()
+  nameWithType: SceneReference.ToString()
+- uid: SmartReference.Runtime.SceneReference.ToString*
+  name: ToString
+  href: api/SmartReference.Runtime.SceneReference.html#SmartReference_Runtime_SceneReference_ToString_
+  commentId: Overload:SmartReference.Runtime.SceneReference.ToString
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SceneReference.ToString
+  nameWithType: SceneReference.ToString
+- uid: SmartReference.Runtime.SmartReference
+  name: SmartReference
+  href: api/SmartReference.Runtime.SmartReference.html
+  commentId: T:SmartReference.Runtime.SmartReference
+  fullName: SmartReference.Runtime.SmartReference
+  nameWithType: SmartReference
+- uid: SmartReference.Runtime.SmartReference.fileID
+  name: fileID
+  href: api/SmartReference.Runtime.SmartReference.html#SmartReference_Runtime_SmartReference_fileID
+  commentId: F:SmartReference.Runtime.SmartReference.fileID
+  fullName: SmartReference.Runtime.SmartReference.fileID
+  nameWithType: SmartReference.fileID
+- uid: SmartReference.Runtime.SmartReference.guid
+  name: guid
+  href: api/SmartReference.Runtime.SmartReference.html#SmartReference_Runtime_SmartReference_guid
+  commentId: F:SmartReference.Runtime.SmartReference.guid
+  fullName: SmartReference.Runtime.SmartReference.guid
+  nameWithType: SmartReference.guid
+- uid: SmartReference.Runtime.SmartReference.InitWithCustomLoader(SmartReference.Runtime.ISmartReferenceLoader)
+  name: InitWithCustomLoader(ISmartReferenceLoader)
+  href: api/SmartReference.Runtime.SmartReference.html#SmartReference_Runtime_SmartReference_InitWithCustomLoader_SmartReference_Runtime_ISmartReferenceLoader_
+  commentId: M:SmartReference.Runtime.SmartReference.InitWithCustomLoader(SmartReference.Runtime.ISmartReferenceLoader)
+  fullName: SmartReference.Runtime.SmartReference.InitWithCustomLoader(SmartReference.Runtime.ISmartReferenceLoader)
+  nameWithType: SmartReference.InitWithCustomLoader(ISmartReferenceLoader)
+- uid: SmartReference.Runtime.SmartReference.InitWithCustomLoader*
+  name: InitWithCustomLoader
+  href: api/SmartReference.Runtime.SmartReference.html#SmartReference_Runtime_SmartReference_InitWithCustomLoader_
+  commentId: Overload:SmartReference.Runtime.SmartReference.InitWithCustomLoader
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference.InitWithCustomLoader
+  nameWithType: SmartReference.InitWithCustomLoader
+- uid: SmartReference.Runtime.SmartReference.InitWithResourcesLoader
+  name: InitWithResourcesLoader()
+  href: api/SmartReference.Runtime.SmartReference.html#SmartReference_Runtime_SmartReference_InitWithResourcesLoader
+  commentId: M:SmartReference.Runtime.SmartReference.InitWithResourcesLoader
+  fullName: SmartReference.Runtime.SmartReference.InitWithResourcesLoader()
+  nameWithType: SmartReference.InitWithResourcesLoader()
+- uid: SmartReference.Runtime.SmartReference.InitWithResourcesLoader*
+  name: InitWithResourcesLoader
+  href: api/SmartReference.Runtime.SmartReference.html#SmartReference_Runtime_SmartReference_InitWithResourcesLoader_
+  commentId: Overload:SmartReference.Runtime.SmartReference.InitWithResourcesLoader
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference.InitWithResourcesLoader
+  nameWithType: SmartReference.InitWithResourcesLoader
+- uid: SmartReference.Runtime.SmartReference.Loader
+  name: Loader
+  href: api/SmartReference.Runtime.SmartReference.html#SmartReference_Runtime_SmartReference_Loader
+  commentId: F:SmartReference.Runtime.SmartReference.Loader
+  fullName: SmartReference.Runtime.SmartReference.Loader
+  nameWithType: SmartReference.Loader
+- uid: SmartReference.Runtime.SmartReference.path
+  name: path
+  href: api/SmartReference.Runtime.SmartReference.html#SmartReference_Runtime_SmartReference_path
+  commentId: F:SmartReference.Runtime.SmartReference.path
+  fullName: SmartReference.Runtime.SmartReference.path
+  nameWithType: SmartReference.path
+- uid: SmartReference.Runtime.SmartReference.type
+  name: type
+  href: api/SmartReference.Runtime.SmartReference.html#SmartReference_Runtime_SmartReference_type
+  commentId: F:SmartReference.Runtime.SmartReference.type
+  fullName: SmartReference.Runtime.SmartReference.type
+  nameWithType: SmartReference.type
+- uid: SmartReference.Runtime.SmartReference`1
+  name: SmartReference<T>
+  href: api/SmartReference.Runtime.SmartReference-1.html
+  commentId: T:SmartReference.Runtime.SmartReference`1
+  name.vb: SmartReference(Of T)
+  fullName: SmartReference.Runtime.SmartReference<T>
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T)
+  nameWithType: SmartReference<T>
+  nameWithType.vb: SmartReference(Of T)
+- uid: SmartReference.Runtime.SmartReference`1.IsLoaded
+  name: IsLoaded
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_IsLoaded
+  commentId: P:SmartReference.Runtime.SmartReference`1.IsLoaded
+  fullName: SmartReference.Runtime.SmartReference<T>.IsLoaded
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).IsLoaded
+  nameWithType: SmartReference<T>.IsLoaded
+  nameWithType.vb: SmartReference(Of T).IsLoaded
+- uid: SmartReference.Runtime.SmartReference`1.IsLoaded*
+  name: IsLoaded
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_IsLoaded_
+  commentId: Overload:SmartReference.Runtime.SmartReference`1.IsLoaded
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference<T>.IsLoaded
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).IsLoaded
+  nameWithType: SmartReference<T>.IsLoaded
+  nameWithType.vb: SmartReference(Of T).IsLoaded
+- uid: SmartReference.Runtime.SmartReference`1.IsLoading
+  name: IsLoading
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_IsLoading
+  commentId: P:SmartReference.Runtime.SmartReference`1.IsLoading
+  fullName: SmartReference.Runtime.SmartReference<T>.IsLoading
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).IsLoading
+  nameWithType: SmartReference<T>.IsLoading
+  nameWithType.vb: SmartReference(Of T).IsLoading
+- uid: SmartReference.Runtime.SmartReference`1.IsLoading*
+  name: IsLoading
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_IsLoading_
+  commentId: Overload:SmartReference.Runtime.SmartReference`1.IsLoading
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference<T>.IsLoading
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).IsLoading
+  nameWithType: SmartReference<T>.IsLoading
+  nameWithType.vb: SmartReference(Of T).IsLoading
+- uid: SmartReference.Runtime.SmartReference`1.Load
+  name: Load()
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_Load
+  commentId: M:SmartReference.Runtime.SmartReference`1.Load
+  fullName: SmartReference.Runtime.SmartReference<T>.Load()
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).Load()
+  nameWithType: SmartReference<T>.Load()
+  nameWithType.vb: SmartReference(Of T).Load()
+- uid: SmartReference.Runtime.SmartReference`1.Load*
+  name: Load
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_Load_
+  commentId: Overload:SmartReference.Runtime.SmartReference`1.Load
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference<T>.Load
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).Load
+  nameWithType: SmartReference<T>.Load
+  nameWithType.vb: SmartReference(Of T).Load
+- uid: SmartReference.Runtime.SmartReference`1.LoadAsync
+  name: LoadAsync()
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_LoadAsync
+  commentId: M:SmartReference.Runtime.SmartReference`1.LoadAsync
+  fullName: SmartReference.Runtime.SmartReference<T>.LoadAsync()
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).LoadAsync()
+  nameWithType: SmartReference<T>.LoadAsync()
+  nameWithType.vb: SmartReference(Of T).LoadAsync()
+- uid: SmartReference.Runtime.SmartReference`1.LoadAsync*
+  name: LoadAsync
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_LoadAsync_
+  commentId: Overload:SmartReference.Runtime.SmartReference`1.LoadAsync
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference<T>.LoadAsync
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).LoadAsync
+  nameWithType: SmartReference<T>.LoadAsync
+  nameWithType.vb: SmartReference(Of T).LoadAsync
+- uid: SmartReference.Runtime.SmartReference`1.LoadAsyncTask
+  name: LoadAsyncTask()
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_LoadAsyncTask
+  commentId: M:SmartReference.Runtime.SmartReference`1.LoadAsyncTask
+  fullName: SmartReference.Runtime.SmartReference<T>.LoadAsyncTask()
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).LoadAsyncTask()
+  nameWithType: SmartReference<T>.LoadAsyncTask()
+  nameWithType.vb: SmartReference(Of T).LoadAsyncTask()
+- uid: SmartReference.Runtime.SmartReference`1.LoadAsyncTask*
+  name: LoadAsyncTask
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_LoadAsyncTask_
+  commentId: Overload:SmartReference.Runtime.SmartReference`1.LoadAsyncTask
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference<T>.LoadAsyncTask
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).LoadAsyncTask
+  nameWithType: SmartReference<T>.LoadAsyncTask
+  nameWithType.vb: SmartReference(Of T).LoadAsyncTask
+- uid: SmartReference.Runtime.SmartReference`1.OnAfterDeserialize
+  name: OnAfterDeserialize()
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_OnAfterDeserialize
+  commentId: M:SmartReference.Runtime.SmartReference`1.OnAfterDeserialize
+  fullName: SmartReference.Runtime.SmartReference<T>.OnAfterDeserialize()
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).OnAfterDeserialize()
+  nameWithType: SmartReference<T>.OnAfterDeserialize()
+  nameWithType.vb: SmartReference(Of T).OnAfterDeserialize()
+- uid: SmartReference.Runtime.SmartReference`1.OnAfterDeserialize*
+  name: OnAfterDeserialize
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_OnAfterDeserialize_
+  commentId: Overload:SmartReference.Runtime.SmartReference`1.OnAfterDeserialize
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference<T>.OnAfterDeserialize
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).OnAfterDeserialize
+  nameWithType: SmartReference<T>.OnAfterDeserialize
+  nameWithType.vb: SmartReference(Of T).OnAfterDeserialize
+- uid: SmartReference.Runtime.SmartReference`1.OnAsyncLoadComplete
+  name: OnAsyncLoadComplete
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_OnAsyncLoadComplete
+  commentId: E:SmartReference.Runtime.SmartReference`1.OnAsyncLoadComplete
+  fullName: SmartReference.Runtime.SmartReference<T>.OnAsyncLoadComplete
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).OnAsyncLoadComplete
+  nameWithType: SmartReference<T>.OnAsyncLoadComplete
+  nameWithType.vb: SmartReference(Of T).OnAsyncLoadComplete
+- uid: SmartReference.Runtime.SmartReference`1.OnBeforeSerialize
+  name: OnBeforeSerialize()
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_OnBeforeSerialize
+  commentId: M:SmartReference.Runtime.SmartReference`1.OnBeforeSerialize
+  fullName: SmartReference.Runtime.SmartReference<T>.OnBeforeSerialize()
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).OnBeforeSerialize()
+  nameWithType: SmartReference<T>.OnBeforeSerialize()
+  nameWithType.vb: SmartReference(Of T).OnBeforeSerialize()
+- uid: SmartReference.Runtime.SmartReference`1.OnBeforeSerialize*
+  name: OnBeforeSerialize
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_OnBeforeSerialize_
+  commentId: Overload:SmartReference.Runtime.SmartReference`1.OnBeforeSerialize
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference<T>.OnBeforeSerialize
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).OnBeforeSerialize
+  nameWithType: SmartReference<T>.OnBeforeSerialize
+  nameWithType.vb: SmartReference(Of T).OnBeforeSerialize
+- uid: SmartReference.Runtime.SmartReference`1.op_Implicit(SmartReference.Runtime.SmartReference{`0})~`0
+  name: implicit operator T(SmartReference<T>)
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_op_Implicit_SmartReference_Runtime_SmartReference__0____0
+  commentId: M:SmartReference.Runtime.SmartReference`1.op_Implicit(SmartReference.Runtime.SmartReference{`0})~`0
+  name.vb: CType(SmartReference(Of T))
+  fullName: SmartReference.Runtime.SmartReference<T>.implicit operator T(SmartReference.Runtime.SmartReference<T>)
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).CType(SmartReference.Runtime.SmartReference(Of T))
+  nameWithType: SmartReference<T>.implicit operator T(SmartReference<T>)
+  nameWithType.vb: SmartReference(Of T).CType(SmartReference(Of T))
+- uid: SmartReference.Runtime.SmartReference`1.op_Implicit*
+  name: implicit operator T
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_op_Implicit_
+  commentId: Overload:SmartReference.Runtime.SmartReference`1.op_Implicit
+  isSpec: "True"
+  name.vb: CType
+  fullName: SmartReference.Runtime.SmartReference<T>.implicit operator T
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).CType
+  nameWithType: SmartReference<T>.implicit operator T
+  nameWithType.vb: SmartReference(Of T).CType
+- uid: SmartReference.Runtime.SmartReference`1.Release
+  name: Release()
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_Release
+  commentId: M:SmartReference.Runtime.SmartReference`1.Release
+  fullName: SmartReference.Runtime.SmartReference<T>.Release()
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).Release()
+  nameWithType: SmartReference<T>.Release()
+  nameWithType.vb: SmartReference(Of T).Release()
+- uid: SmartReference.Runtime.SmartReference`1.Release*
+  name: Release
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_Release_
+  commentId: Overload:SmartReference.Runtime.SmartReference`1.Release
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference<T>.Release
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).Release
+  nameWithType: SmartReference<T>.Release
+  nameWithType.vb: SmartReference(Of T).Release
+- uid: SmartReference.Runtime.SmartReference`1.ReleaseRequested
+  name: ReleaseRequested
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_ReleaseRequested
+  commentId: P:SmartReference.Runtime.SmartReference`1.ReleaseRequested
+  fullName: SmartReference.Runtime.SmartReference<T>.ReleaseRequested
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).ReleaseRequested
+  nameWithType: SmartReference<T>.ReleaseRequested
+  nameWithType.vb: SmartReference(Of T).ReleaseRequested
+- uid: SmartReference.Runtime.SmartReference`1.ReleaseRequested*
+  name: ReleaseRequested
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_ReleaseRequested_
+  commentId: Overload:SmartReference.Runtime.SmartReference`1.ReleaseRequested
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference<T>.ReleaseRequested
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).ReleaseRequested
+  nameWithType: SmartReference<T>.ReleaseRequested
+  nameWithType.vb: SmartReference(Of T).ReleaseRequested
+- uid: SmartReference.Runtime.SmartReference`1.Value
+  name: Value
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_Value
+  commentId: P:SmartReference.Runtime.SmartReference`1.Value
+  fullName: SmartReference.Runtime.SmartReference<T>.Value
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).Value
+  nameWithType: SmartReference<T>.Value
+  nameWithType.vb: SmartReference(Of T).Value
+- uid: SmartReference.Runtime.SmartReference`1.Value*
+  name: Value
+  href: api/SmartReference.Runtime.SmartReference-1.html#SmartReference_Runtime_SmartReference_1_Value_
+  commentId: Overload:SmartReference.Runtime.SmartReference`1.Value
+  isSpec: "True"
+  fullName: SmartReference.Runtime.SmartReference<T>.Value
+  fullName.vb: SmartReference.Runtime.SmartReference(Of T).Value
+  nameWithType: SmartReference<T>.Value
+  nameWithType.vb: SmartReference(Of T).Value
