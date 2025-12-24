@@ -10,8 +10,9 @@ namespace SmartReference.Runtime
         /// </summary>
         /// <param name="path">The path of the asset, begin with `Assets/`.</param>
         /// <param name="type">The type of the asset.</param>
-        /// <returns>The loaded Object.</returns>
-        public Object Load(string path, Type type);
+        /// <param name="loadedObject">The loaded asset.</param>
+        /// <returns>An `ISmartReferenceHandle` that stores custom data about the load operation.</returns>
+        public ISmartReferenceHandle Load(string path, Type type, out Object loadedObject);
         
         /// <summary>
         /// Load an asset asynchronously.

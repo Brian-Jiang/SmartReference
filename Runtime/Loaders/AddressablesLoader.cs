@@ -9,24 +9,19 @@ namespace SmartReference.Runtime
 {
     public class AddressablesLoader: ISmartReferenceLoader
     {
-        public Object Load(string path, Type type)
+        public ISmartReferenceHandle Load(string path, Type type, out Object loadedObject)
         {
-            Object result = null;
             var handle = Addressables.LoadAssetAsync<Object>(path);
-            handle.Completed += operation =>
-            {
-                if (operation.Status == AsyncOperationStatus.Succeeded)
-                {
-                    result = operation.Result;
-                }
-            };
             
 #if !UNITY_WEBGL
             handle.WaitForCompletion();
 #else
             UnityEngine.Debug.LogError("AddressablesLoader.Load called in WebGL build; synchronous loading is not supported. Consider using LoadAsync instead.");
 #endif
-            return result;
+
+            loadedObject = handle.Result;
+            var h = new AddressablesHandle { op = handle };
+            return h;
         }
 
         public ISmartReferenceHandle LoadAsync(string path, Type type, Action<Object> callback)
@@ -47,6 +42,7 @@ namespace SmartReference.Runtime
             if (handle is AddressablesHandle { IsValid: true } addressablesHandle)
             {
                 Addressables.Release(addressablesHandle.op);
+                addressablesHandle.op = default;
             }
         }
 

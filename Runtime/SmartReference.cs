@@ -104,7 +104,8 @@ namespace SmartReference.Runtime
             }
         }
 
-        public static implicit operator T(SmartReference<T> reference) {
+        public static implicit operator T(SmartReference<T> reference)
+        {
             return reference.Value;
         }
 
@@ -119,13 +120,22 @@ namespace SmartReference.Runtime
                 return;
             }
             
-            if (Loader == null) {
+            if (Loader == null)
+            {
                 LogEmptyLoaderError();
                 return;
             }
+
+            if (isLoading)
+            {
+                Debug.LogWarning($"[SmartReference] Asset at path: {path} is currently loading asynchronously. Please wait for the OnAsyncLoadComplete event.");
+                return;
+            }
             
-            value = (T) Loader.Load(path, typeof(T));
-            if (value == null) {
+            handle = Loader.Load(path, typeof(T), out var result);
+            value = (T) result;
+            if (value == null)
+            {
                 LogLoadAssetNullError();
             }
         }

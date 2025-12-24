@@ -260,14 +260,11 @@ namespace SmartReference.Runtime.Tests
 
             // Immediately request release while loading
             r.Release();
-
-            // Depending on your implementation, cancel may be called (best-effort)
+            
             Assert.AreEqual(stub.CancelCalls, 1);
 
             yield return WaitForTask(t);
-
-            // After completion, release should have been performed
-            // (Your SmartReference.Release() logic might release immediately or defer until callback.)
+            
             Assert.AreEqual(stub.ReleaseCalls, 0);
         }
 
@@ -337,10 +334,11 @@ namespace SmartReference.Runtime.Tests
                 this.delayFrames = Mathf.Max(0, delayFrames);
             }
 
-            public Object Load(string path, Type type)
+            public ISmartReferenceHandle Load(string path, Type type, out Object loadedObject)
             {
                 LoadCalls++;
-                return CreateObject(type);
+                loadedObject = CreateObject(type);
+                return new H();
             }
 
             public global::SmartReference.Runtime.ISmartReferenceHandle LoadAsync(string path, Type type, Action<Object> onComplete)

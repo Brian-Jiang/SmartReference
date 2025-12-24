@@ -14,7 +14,7 @@ public class MyHandler : ISmartReferenceHandle
 
 public class MyLoader : ISmartReferenceLoader
 {
-    public Object Load(string path, Type type)
+    public ISmartReferenceHandle Load(string path, Type type, out Object loadedObject)
     {
         // Your custom synchronous load logic here
     }
@@ -24,7 +24,7 @@ public class MyLoader : ISmartReferenceLoader
         // Your custom asynchronous load logic here
     }
 
-    public void Release(ISmartReferenceHandle handle, Object asset)
+    public void Release(ISmartReferenceHandle handle)
     {
         // Your custom release logic here
     }

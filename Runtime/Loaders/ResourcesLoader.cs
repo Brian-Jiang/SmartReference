@@ -6,10 +6,12 @@ namespace SmartReference.Runtime
 {
     public class ResourcesLoader: ISmartReferenceLoader
     {
-        public Object Load(string path, Type type)
+        public ISmartReferenceHandle Load(string path, Type type, out Object loadedObject)
         {
             var resourcesPath = GetResourcesPath(path);
-            return Resources.Load(resourcesPath, type);
+            var result = Resources.Load(resourcesPath, type);
+            loadedObject = result;
+            return new ResourcesHandle { loadedObject = result };
         }
 
         public ISmartReferenceHandle LoadAsync(string path, Type type, Action<Object> callback)
@@ -17,7 +19,7 @@ namespace SmartReference.Runtime
             var resourcesPath = GetResourcesPath(path);
             var request = Resources.LoadAsync(resourcesPath, type);
             request.completed += _ => callback?.Invoke(request.asset);
-            return new ResourcesHandle();
+            return new ResourcesHandle { loadedObject = request.asset };
         }
 
         public void Release(ISmartReferenceHandle handle)
