@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Smart Reference | Smart Reference </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Smart Reference | Smart Reference ">
+    
+      <link rel="shortcut icon" href="favicon.ico">
+      <link rel="stylesheet" href="styles/docfx.vendor.css">
+      <link rel="stylesheet" href="styles/docfx.css">
+      <link rel="stylesheet" href="styles/main.css">
+      <meta property="docfx:navrel" content="toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="index.html">
+                <img id="logo" class="svg" src="logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="smart-reference">Smart Reference</h1>
+
+<h4 id="version-200">version 2.0.0</h4>
+<p><a href="https://github.com/Brian-Jiang/SmartReference/actions/workflows/docfx-build-publish.yml"><img src="https://github.com/Brian-Jiang/SmartReference/actions/workflows/docfx-build-publish.yml/badge.svg?branch=main" alt="DocFX Build and Publish"></a>
+<a href="https://github.com/Brian-Jiang/SmartReference/releases"><img src="https://img.shields.io/github/v/release/Brian-Jiang/SmartReference?label=github&amp;style=flat-square" alt="GitHub release (latest by date)"></a>
+<a href="https://openupm.com/packages/com.xiaojiang.smartreference/"><img src="https://img.shields.io/npm/v/com.xiaojiang.smartreference?label=openupm&amp;registry_uri=https://package.openupm.com" alt="openupm"></a>
+<a href="https://u3d.as/35Sh"><img src="https://img.shields.io/badge/Unity%20Asset%20Store-Smart%20Reference-blue.svg" alt="Unity Asset Store"></a></p>
+<hr>
+<h2 id="summary">Summary</h2>
+<p>Smart Reference is a Unity plugin that enables lazy loading asset references in <code>ScriptableObject</code> and <code>MonoBehaviour</code>.
+In Unity, referencing assets directly creates implicit dependencies.
+When the <code>MonoBehaviour</code> or <code>ScriptableObject</code> is loaded, all referenced assets are loaded immediately, which can lead to slow startup times and unnecessary memory usage, especially in data driven projects.</p>
+<p>Smart Reference solves this by allowing you to reference assets without loading them upfront, while keeping the same editor workflow.
+Assets are only loaded when you use them at runtime.</p>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="1-replace-direct-unity-references-with-smartreferencet">1. Replace direct Unity references with <code>SmartReference&lt;T&gt;</code></h3>
+<p>In the Inspector, SmartReference<t> looks and behaves like a normal object reference.</t></p>
+<pre><code class="lang-csharp">using UnityEngine;
+using SmartReference.Runtime;
+
+public class MonsterData : ScriptableObject
+{
+    public SmartReference&lt;GameObject&gt; prefab;
+    public SmartReference&lt;Sprite&gt; icon;
+    public string description;
+}
+
+</code></pre>
+<h3 id="2-initialize-smart-reference-at-startup">2. Initialize Smart Reference at startup</h3>
+<p>Choose the loader that matches your project setup.</p>
+<h4 id="addressables-recommended">Addressables (recommended)</h4>
+<pre><code class="lang-csharp">using SmartReference.Runtime;
+
+SmartReference.InitWithAddressablesLoader();
+</code></pre>
+<h4 id="resources">Resources</h4>
+<pre><code class="lang-csharp">using SmartReference.Runtime;
+
+SmartReference.InitWithResourcesLoader();
+</code></pre>
+<h4 id="custom-loader">Custom Loader</h4>
+<pre><code class="lang-csharp">SmartReference.InitWithCustomLoader(new MyCustomLoader());
+</code></pre>
+<p>Initialization must happen once, before any <code>SmartReference</code> is accessed.</p>
+<h3 id="3-load-assets-when-needed">3. Load assets when needed</h3>
+<h4 id="asynchronous-loading-with-unitask-recommended">Asynchronous Loading with UniTask (recommended)</h4>
+<pre><code class="lang-csharp">var prefab = await monsterData.prefab.LoadAsyncUniTask();
+Instantiate(prefab);
+</code></pre>
+<h4 id="asynchronous-loading-with-c-asyncawait">Asynchronous Loading with C# Async/Await</h4>
+<pre><code class="lang-csharp">var prefab = await monsterData.prefab.LoadAsyncTask();
+Instantiate(prefab);
+</code></pre>
+<h4 id="asynchronous-loading-with-callbacks">Asynchronous Loading with Callbacks</h4>
+<pre><code class="lang-csharp">monsterData.prefab.OnAsyncLoadComplete += go =&gt;
+{
+    Instantiate(go);
+};
+monsterData.prefab.LoadAsync();
+</code></pre>
+<h4 id="synchronous-loading">Synchronous Loading</h4>
+<pre><code class="lang-csharp">var prefab = monsterData.prefab.Load();
+Instantiate(prefab);
+</code></pre>
+<h2 id="supports">Supports</h2>
+<p>If you have questions or feedback:</p>
+<ul>
+<li>Leave an issue at <a href="https://github.com/Brian-Jiang/SmartReference/issues">GitHub Issues</a></li>
+<li>Leave a comment at <a href="https://u3d.as/35Sh">Asset Store</a></li>
+<li>Email: <a href="mailto:bjjx1999@live.com">bjjx1999@live.com</a></li>
+</ul>
+<p>Thank you for your support!</p>
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/Brian-Jiang/SmartReference/blob/main/Tools~/DocFx/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Smart Reference
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>

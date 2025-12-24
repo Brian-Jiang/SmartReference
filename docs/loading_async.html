@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Loading Assets Asynchronously | Smart Reference </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Loading Assets Asynchronously | Smart Reference ">
+    
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="loading-assets-asynchronously">Loading Assets Asynchronously</h1>
+
+<p>Asynchronous loading allows assets to be loaded without blocking execution, helping maintain smooth frame rates and responsive gameplay.</p>
+<p>Smart Reference supports multiple async styles to fit different coding patterns and project needs.</p>
+<hr>
+<h2 id="with-event-callback">With Event Callback</h2>
+<p>This approach uses an event-style callback and is suitable for fire-and-forget loading, such as UI elements or effects.</p>
+<pre><code class="lang-csharp">using UnityEngine;
+using SmartReference.Runtime;
+
+public class CallbackExample : MonoBehaviour
+{
+    [SerializeField] private SmartReference&lt;GameObject&gt; reference;
+
+    void Start()
+    {
+        reference.OnAsyncLoadComplete += OnLoaded;
+        reference.LoadAsync();
+    }
+
+    void OnLoaded(GameObject go)
+    {
+        Debug.Log(&quot;Reference loaded: &quot; + go.name);
+        Instantiate(go);
+    }
+}
+</code></pre>
+<p>This style does not require <code>async/await</code> and works well when the load result is handled immediately.</p>
+<hr>
+<h2 id="with-c-asyncawait">With C# Async/Await</h2>
+<p>This approach integrates with standard C# <code>async/await</code> workflows and is suitable when composing multiple async operations using <code>Task</code>.</p>
+<pre><code class="lang-csharp">using UnityEngine;
+using SmartReference.Runtime;
+using System.Threading.Tasks;
+
+public class TaskExample : MonoBehaviour
+{
+    [SerializeField] private SmartReference&lt;GameObject&gt; prefab;
+
+    private async Task&lt;GameObject&gt; LoadPrefabAsync()
+    {
+        var go = await prefab.LoadAsyncTask();
+        return go;
+    }
+}
+</code></pre>
+<p>Avoid calling <code>.Result</code> or <code>.Wait()</code> on async methods, as this will block the main thread and defeats the purpose of asynchronous loading.</p>
+<hr>
+<h2 id="with-unitask">With UniTask</h2>
+<p>If your project uses UniTask, Smart Reference provides a zero-allocation async API optimized for performance-critical paths.</p>
+<pre><code class="lang-csharp">using UnityEngine;
+using SmartReference.Runtime;
+using Cysharp.Threading.Tasks;
+
+public class UniTaskExample : MonoBehaviour
+{
+    [SerializeField] private SmartReference&lt;GameObject&gt; reference;
+
+    public async UniTaskVoid Spawn()
+    {
+        var asset = await reference.LoadAsyncUniTask();
+        Instantiate(asset);
+    }
+}
+</code></pre>
+<p>This is the recommended async approach for gameplay code when UniTask is available.</p>
+<hr>
+<h2 id="choosing-an-async-style">Choosing an Async Style</h2>
+<ul>
+<li>Event callback: Simple, lightweight, no <code>async/await</code></li>
+<li>Task-based async: Integrates with standard .NET async flows</li>
+<li>UniTask: Best performance and lowest allocation cost</li>
+</ul>
+<p>All async methods delegate to the active loader. Cancellation and release behavior depend on the loader implementation.</p>
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/Brian-Jiang/SmartReference/blob/main/Tools~/DocFx/docs/loading_async.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Smart Reference
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
