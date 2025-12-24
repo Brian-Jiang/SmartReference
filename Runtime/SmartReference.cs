@@ -249,7 +249,7 @@ namespace SmartReference.Runtime
         /// <summary>
         /// Release the loaded asset.
         /// Safe to call multiple times.
-        /// If called during loading, attempts cancel the loading.
+        /// If called during loading, attempts to cancel the loading.
         /// </summary>
         public void Release()
         {

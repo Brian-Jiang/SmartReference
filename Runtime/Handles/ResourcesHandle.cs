@@ -4,7 +4,7 @@ namespace SmartReference.Runtime
 {
     public class ResourcesHandle : ISmartReferenceHandle
     {
+        public ResourceRequest request;
         public Object loadedObject;
-        public bool IsValid => loadedObject != null;
     }
 }

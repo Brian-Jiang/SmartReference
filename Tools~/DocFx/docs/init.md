@@ -19,7 +19,7 @@ SmartReference.InitWithResourcesLoader();
 Use this option only when all referenced assets are located inside a Resources folder.
 
 Note that all Resources assets are treated as a single bundle, meaning the entire Resources folder is loaded into memory at runtime.
-Because of the limitation, this loader is best suited for small projects, tools, or prototypes.
+Because of this limitation, this loader is best suited for small projects, tools, or prototypes.
 
 ---
 

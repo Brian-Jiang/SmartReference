@@ -19,14 +19,24 @@ namespace SmartReference.Runtime
             var resourcesPath = GetResourcesPath(path);
             var request = Resources.LoadAsync(resourcesPath, type);
             request.completed += _ => callback?.Invoke(request.asset);
-            return new ResourcesHandle { loadedObject = request.asset };
+            return new ResourcesHandle { request =  request };
         }
 
         public void Release(ISmartReferenceHandle handle)
         {
-            if (handle is ResourcesHandle { IsValid: true } resourcesHandle)
+            if (handle is ResourcesHandle resourcesHandle)
             {
-                Resources.UnloadAsset(resourcesHandle.loadedObject);
+                if (resourcesHandle.loadedObject != null)
+                {
+                    Resources.UnloadAsset(resourcesHandle.loadedObject);
+                } else if (resourcesHandle.request != null)
+                {
+                    var loadedAsset = resourcesHandle.request.asset;
+                    if (loadedAsset != null)
+                    {
+                        Resources.UnloadAsset(loadedAsset);
+                    }
+                }
             }
         }
 

@@ -19,7 +19,9 @@ namespace SmartReference.Runtime
         /// </summary>
         /// <param name="path">The path of the asset, begin with `Assets/`.</param>
         /// <param name="type">the type of the asset.</param>
-        /// <param name="callback">The callback to invoke once the load has finished.</param>
+        /// <param name="callback">The callback to invoke once the load has finished.
+        /// If your loader cancels the async load, you should call this callback with `null`.
+        /// If not, you should call this with loaded `Object`, another `Release` will be called afterwards</param>
         /// <returns>An `ISmartReferenceHandle` that stores custom data about the load operation.</returns>
         public ISmartReferenceHandle LoadAsync(string path, Type type, Action<Object> callback);
         
@@ -31,7 +33,7 @@ namespace SmartReference.Runtime
 
         /// <summary>
         /// Cancel an ongoing asynchronous load operation. This will be called when the asset is released when it's still loading asynchronously.
-        /// Note that if the async callback is called later after a loading is canceled, the `Release` method will be called to clean up the loaded asset.
+        /// Note that if the async callback is called later after loading is canceled, the `Release` method will be called to clean up the loaded asset.
         /// </summary>
         /// <param name="handle">The handle returned by `LoadAsync`.</param>
         void Cancel(ISmartReferenceHandle handle);
