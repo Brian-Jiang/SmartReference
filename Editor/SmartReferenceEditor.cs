@@ -3,9 +3,11 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SmartReference.Editor {
+namespace SmartReference.Editor
+{
     [CustomPropertyDrawer(typeof(Runtime.SmartReference), true)]
-    internal class SmartReferenceEditor: PropertyDrawer {
+    internal class SmartReferenceEditor: PropertyDrawer
+    {
         private SerializedProperty cacheProperty;
         private Object referencedObject;
         private SerializedProperty guidProp;
@@ -13,7 +15,8 @@ namespace SmartReference.Editor {
         private SerializedProperty pathProp;
         private SerializedProperty typeProp;
 
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
             if (!SerializedProperty.EqualContents(property, cacheProperty)) {
                 cacheProperty = property;
                 referencedObject = null;
@@ -38,26 +41,16 @@ namespace SmartReference.Editor {
             }
             
             var type = Type.GetType(typeProp.stringValue);
-            var referenced = EditorGUI.ObjectField(position, label, referencedObject, type, false);
-            if (referencedObject != referenced) {
-                if (referenced == null) {
-                    guidProp.stringValue = string.Empty;
-                    fileIDProp.longValue = 0;
-                    pathProp.stringValue = string.Empty;
-                    return;
+            var newReferenced = EditorGUI.ObjectField(position, label, referencedObject, type, false);
+            if (referencedObject != newReferenced) {
+                referencedObject = newReferenced;
+                if (newReferenced == null) {
+                    SmartReferenceTool.ClearReference(property);
                 }
-                
-                if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(referenced, out var guid, out long fileID)) {
-                    Debug.LogError(
-                        $"[SmartReferenceEditor] Failed to get guid and fileID, path: {AssetDatabase.GetAssetPath(referenced)}");
-                    return;
+                else
+                {
+                    SmartReferenceTool.SetReference(property, newReferenced);
                 }
-                
-                guidProp.stringValue = guid;
-                fileIDProp.longValue = fileID;
-                pathProp.stringValue = AssetDatabase.GetAssetPath(referenced);
-                
-                referencedObject = referenced;
             }
         }
     }

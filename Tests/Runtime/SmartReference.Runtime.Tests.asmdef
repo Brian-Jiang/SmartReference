@@ -1,18 +1,23 @@
 {
-    "name": "SmartReference.Runtime",
-    "rootNamespace": "SmartReference.Runtime",
+    "name": "SmartReference.Runtime.Tests",
+    "rootNamespace": "SmartReference.Runtime.Tests",
     "references": [
-        "Unity.Addressables",
-        "Unity.ResourceManager",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "SmartReference.Runtime",
         "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
     "versionDefines": [
         {
             "name": "com.unity.addressables",

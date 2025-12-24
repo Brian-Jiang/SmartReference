@@ -1,5 +1,9 @@
 items:
-- name: Quick Start
-  href: index.md
-- name: API Documentation
-  href: api/
+  - name: Quick Start
+    href: index.md
+    
+  - name: Manual
+    href: docs/
+    
+  - name: API Documentation
+    href: api/

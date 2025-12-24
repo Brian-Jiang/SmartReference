@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## 2.0.0
+- Add asset release API
+- Add async loading cancellation support
+- Support UniTask for async loading
+- Add editor tool for setting references through editor scripts
+- Update documentation
+
 ## 1.0.0
 - Improve scene reference, add auto fix button
 - Use version defines
