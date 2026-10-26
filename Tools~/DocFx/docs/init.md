@@ -55,6 +55,9 @@ Initialization must be performed:
 
 If initialization is skipped, calling Load or LoadAsync will result in runtime errors.
 
+The loader and every reference's cached load state are reset at the start of each play session, so Smart Reference also works with domain reload disabled.
+Because of this, initialize at `BeforeSceneLoad` or later, not from editor-only code such as `[InitializeOnLoad]`.
+
 ### Recommended: Runtime Initialization
 ```csharp
 using UnityEngine;
