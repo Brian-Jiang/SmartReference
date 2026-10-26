@@ -61,6 +61,8 @@ namespace SmartReference.Editor.Tests
             // Ensure type matches the asset type
             var typeProp = smartRefProp.FindPropertyRelative("type");
             typeProp.stringValue = typeof(TestAssetSO).AssemblyQualifiedName;
+            var goTypeProp = smartRefToGoProp.FindPropertyRelative("type");
+            goTypeProp.stringValue = typeof(GameObject).AssemblyQualifiedName;
             serializedContainer.ApplyModifiedPropertiesWithoutUndo();
         }
 
