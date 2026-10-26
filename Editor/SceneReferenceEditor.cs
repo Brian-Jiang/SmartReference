@@ -60,6 +60,7 @@ namespace SmartReference.Editor
                 Refresh();
             });
             DrawerUtils.AddPrefabOverrideMenu(field, property);
+            DrawerUtils.AddPrefabOverrideBar(field, property);
             fixButton.clicked += () => {
                 FixScene(scenePathProp.stringValue);
                 RefreshStatus();

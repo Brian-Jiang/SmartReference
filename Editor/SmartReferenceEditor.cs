@@ -47,6 +47,7 @@ namespace SmartReference.Editor
                 Refresh();
             });
             DrawerUtils.AddPrefabOverrideMenu(field, property);
+            DrawerUtils.AddPrefabOverrideBar(field, property);
             return root;
         }
 
