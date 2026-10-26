@@ -86,9 +86,15 @@ monsterData.prefab.LoadAsync();
 
 #### Synchronous Loading
 ```csharp
-var prefab = monsterData.prefab.Load();
+var prefab = monsterData.prefab.Value;
 Instantiate(prefab);
 ```
+`Value` loads the asset on first access. You can also call `Load()` ahead of time and read `Value` later.
+
+### 4. Keep references up to date in builds
+Smart Reference stores the asset path next to its GUID. Before each player build, the paths of all references in assets, prefabs and scenes are updated, so moved or renamed assets still load. You can also run it from **Tools > SmartReference > Update All References**.
+
+Addressables content builds don't run player build callbacks. To update references before them, create **Assets > Create > Addressables > Content Builders > SmartReference Packed Mode**, add it to **Build and Play Mode Scripts** in your Addressables settings, and select it as the build script.
 
 ## Supports
 If you have questions or feedback:

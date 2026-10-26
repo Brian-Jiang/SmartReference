@@ -37,6 +37,13 @@ This is the recommended option for most production projects.
 It supports asynchronous, non-blocking loading and integrates cleanly with Addressables’ reference counting and memory management.
 It also enables advanced workflows such as remote content delivery, DLC, and asset bundles.
 
+Smart Reference updates the asset paths of all references before each player build. Addressables content builds don't run player build callbacks, so to update them before a content build:
+1. Create **Assets > Create > Addressables > Content Builders > SmartReference Packed Mode**.
+2. Add the created asset to **Build and Play Mode Scripts** in your Addressables settings.
+3. Select **SmartReference Packed Mode** as the build script in the Addressables Groups window.
+
+It runs the default packed mode build after updating the references.
+
 ---
 
 ## Init with Custom Loader

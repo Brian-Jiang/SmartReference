@@ -79,7 +79,7 @@ monsterData.prefab.LoadAsync();
 
 #### Synchronous Loading
 ```csharp
-var prefab = monsterData.prefab.Load();
+var prefab = monsterData.prefab.Value;
 Instantiate(prefab);
 ```
 
