@@ -84,10 +84,22 @@ namespace SmartReference.Runtime
     {
         [NonSerialized] private T value;
         
+        [NonSerialized] private Action<T> onAsyncLoadComplete;
+
         /// <summary>
         /// Event invoked when the asynchronous load is complete.
         /// </summary>
-        public event Action<T> OnAsyncLoadComplete; 
+        public event Action<T> OnAsyncLoadComplete
+        {
+            add {
+                EnsureCurrentSession();
+                onAsyncLoadComplete += value;
+            }
+            remove {
+                EnsureCurrentSession();
+                onAsyncLoadComplete -= value;
+            }
+        }
         
         [NonSerialized] private bool isLoading;
         [NonSerialized] private TaskCompletionSource<T> inFlightTaskTcs;
@@ -185,8 +197,8 @@ namespace SmartReference.Runtime
             }
             
             handle = Loader.Load(path, typeof(T), out var result);
-            value = (T) result;
-            if (value == null)
+            value = CastOrRelease(result);
+            if (value == null && result == null)
             {
                 LogLoadAssetNullError();
             }
@@ -492,7 +504,7 @@ namespace SmartReference.Runtime
         
         private void CompleteInFlight(T result)
         {
-            OnAsyncLoadComplete?.Invoke(result);
+            onAsyncLoadComplete?.Invoke(result);
             
             // Task
             if (inFlightTaskTcs != null)
@@ -551,7 +563,7 @@ namespace SmartReference.Runtime
 #if UNITY_2023_2_OR_NEWER
             awaitableWaiters = null;
 #endif
-            OnAsyncLoadComplete = null;
+            onAsyncLoadComplete = null;
 #endif
         }
 
@@ -561,22 +573,54 @@ namespace SmartReference.Runtime
             if (loadSession != Session) return;
 
             isLoading = false;
+
+            // Release was called during loading. Callers get null rather than an asset that is released right away.
+            if (releaseRequested)
+            {
+                releaseRequested = false;
+                if (obj != null)
+                {
+                    ReleaseHandle();
+                }
+
+                handle = null;
+                CompleteInFlight(null);
+                return;
+            }
+
             if (obj == null)
             {
                 CompleteInFlight(null);
-                if (releaseRequested) return;
-                
                 LogLoadAssetNullError();
                 return;
             }
 
-            value = (T) obj;
+            value = CastOrRelease(obj);
             CompleteInFlight(value);
-            
-            // If Release was called during loading, release immediately after completion.
-            if (releaseRequested)
+        }
+
+        /// <summary>
+        /// Cast a loaded object to T. If the loader returned another type, log an error and release it.
+        /// </summary>
+        private T CastOrRelease(Object obj)
+        {
+            if (obj == null || obj is T) return (T) obj;
+
+            Debug.LogError($"[SmartReference] Loaded asset at path: {path} is {obj.GetType()}, expected {typeof(T)}");
+            ReleaseHandle();
+            handle = null;
+            return null;
+        }
+
+        private void ReleaseHandle()
+        {
+            try
             {
-                Release();
+                Loader.Release(handle);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[SmartReference] Release failed for asset at path: {path}. Exception: {e}");
             }
         }
         

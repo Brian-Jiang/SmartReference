@@ -62,7 +62,11 @@ namespace SmartReference.Editor
             DrawerUtils.AddPrefabOverrideMenu(field, property);
             DrawerUtils.AddPrefabOverrideBar(field, property);
             fixButton.clicked += () => {
-                FixScene(scenePathProp.stringValue);
+                // The button may be stale, check the current value again before changing the scene list
+                property.serializedObject.Update();
+                if (!property.hasMultipleDifferentValues && GetSceneStatus(scenePathProp.stringValue, out _, out var fixable) && fixable) {
+                    FixScene(scenePathProp.stringValue);
+                }
                 RefreshStatus();
             };
 
@@ -116,11 +120,16 @@ namespace SmartReference.Editor
             return height + EditorGUIUtility.singleLineHeight * (fixable ? 2 : 1);
         }
         
-        private static bool GetSceneStatus(string scenePath, out string message, out bool fixable)
+        internal static bool GetSceneStatus(string scenePath, out string message, out bool fixable)
         {
             message = null;
             fixable = false;
             if (string.IsNullOrEmpty(scenePath)) return false;
+
+            if (!SceneExists(scenePath)) {
+                message = $"Scene asset is missing, path: {scenePath}";
+                return true;
+            }
 
             var buildScenes = GetBuildScenes(out var listName);
             var sceneInBuildSettings = buildScenes.Any(t => t.path == scenePath);
@@ -142,8 +151,10 @@ namespace SmartReference.Editor
             return true;
         }
 
-        private static void FixScene(string scenePath)
+        internal static void FixScene(string scenePath)
         {
+            if (string.IsNullOrEmpty(scenePath) || !SceneExists(scenePath)) return;
+
             var newScenes = GetBuildScenes(out _).ToList();
             var index = newScenes.FindIndex(t => t.path == scenePath);
             if (index < 0) {
@@ -155,7 +166,12 @@ namespace SmartReference.Editor
             SetBuildScenes(newScenes.ToArray());
         }
 
-        private static EditorBuildSettingsScene[] GetBuildScenes(out string listName)
+        private static bool SceneExists(string scenePath)
+        {
+            return AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath) != null;
+        }
+
+        internal static EditorBuildSettingsScene[] GetBuildScenes(out string listName)
         {
 #if UNITY_6000_0_OR_NEWER
             var profile = BuildProfile.GetActiveBuildProfile();
@@ -168,7 +184,7 @@ namespace SmartReference.Editor
             return EditorBuildSettings.scenes;
         }
 
-        private static void SetBuildScenes(EditorBuildSettingsScene[] scenes)
+        internal static void SetBuildScenes(EditorBuildSettingsScene[] scenes)
         {
 #if UNITY_6000_0_OR_NEWER
             var profile = BuildProfile.GetActiveBuildProfile();

@@ -15,6 +15,7 @@ namespace SmartReference.Editor.Tests
     {
         private const string RootFolder = "Assets/SmartReferenceTool_EditModeTestAssets";
         private const string SoAssetPath = RootFolder + "/TestAsset.asset";
+        private const string TextureAssetPath = RootFolder + "/TestTexture.asset";
         private const string UnknownGuid = "0123456789abcdef0123456789abcdef";
 
         private TestContainerSO container;
@@ -31,6 +32,9 @@ namespace SmartReference.Editor.Tests
             var testAsset = ScriptableObject.CreateInstance<TestAssetSO>();
             testAsset.name = "TestAsset";
             CreateOrReplaceAsset(testAsset, SoAssetPath);
+
+            var texture = new Texture2D(4, 4);
+            CreateOrReplaceAsset(texture, TextureAssetPath);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -235,6 +239,18 @@ namespace SmartReference.Editor.Tests
             Assert.AreEqual(SoAssetPath, baseRefProp.FindPropertyRelative("path").stringValue);
         }
 
+        [Test]
+        public void SetReference_AcceptsTexture2DInTextureReference()
+        {
+            var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(TextureAssetPath);
+            var textureRefProp = serializedContainer.FindProperty("refToTexture");
+            textureRefProp.FindPropertyRelative("type").stringValue = typeof(Texture).AssemblyQualifiedName;
+
+            SmartReferenceTool.SetReference(textureRefProp, texture);
+
+            Assert.AreEqual(TextureAssetPath, textureRefProp.FindPropertyRelative("path").stringValue);
+        }
+
         // ---------------------------
         // ResolveReference
         // ---------------------------
@@ -338,6 +354,7 @@ namespace SmartReference.Editor.Tests
             public SmartReference<TestAssetSO> refToAsset;
             public SmartReference<GameObject> refToGameObject;
             public SmartReference<ScriptableObject> refToBase;
+            public SmartReference<Texture> refToTexture;
             public List<SmartReference<TestAssetSO>> refList;
             public Object notARef;
         }

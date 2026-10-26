@@ -444,6 +444,117 @@ namespace SmartReference.Runtime.Tests
             Assert.AreEqual(stub.ReleaseCalls, 0);
         }
 
+        [UnityTest]
+        public IEnumerator Release_DuringLoading_LoaderIgnoresCancel_CallersGetNull_AndAssetReleased()
+        {
+            var stub = new StubLoader(delayFrames: 2, honorCancel: false);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new global::SmartReference.Runtime.SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            var completeEvents = 0;
+            SmartReferenceTestSO eventResult = null;
+            r.OnAsyncLoadComplete += result =>
+            {
+                completeEvents++;
+                eventResult = result;
+            };
+            var t = r.LoadAsyncTask();
+
+            r.Release();
+            Assert.IsTrue(r.ReleaseRequested);
+
+            yield return WaitForTask(t);
+
+            Assert.IsNull(t.Result);
+            Assert.AreEqual(1, completeEvents);
+            Assert.IsNull(eventResult);
+            Assert.AreEqual(1, stub.ReleaseCalls);
+            Assert.IsFalse(r.IsLoaded);
+            Assert.IsFalse(r.IsLoading);
+            Assert.IsFalse(r.ReleaseRequested);
+            LogAssert.NoUnexpectedReceived();
+
+            // The reference can be loaded again
+            var t2 = r.LoadAsyncTask();
+            yield return WaitForTask(t2);
+            Assert.NotNull(t2.Result);
+        }
+
+        [UnityTest]
+        public IEnumerator AsyncLoad_HandlerAddedBeforeFirstLoad_IsInvoked()
+        {
+            var stub = new StubLoader(delayFrames: 1);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            // A fresh reference hasn't seen this play session yet, the handler must survive the session sync
+            var r = new global::SmartReference.Runtime.SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            SmartReferenceTestSO eventResult = null;
+            r.OnAsyncLoadComplete += result => eventResult = result;
+            r.LoadAsync();
+
+            for (int i = 0; i < 3 && eventResult == null; i++)
+                yield return null;
+
+            Assert.NotNull(eventResult);
+        }
+
+        [Test]
+        public void SyncLoad_LoaderReturnsWrongType_LogsErrorAndReleases()
+        {
+            var stub = new StubLoader(delayFrames: 0);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            // The stub returns a ScriptableObject for types it doesn't know
+            var r = new global::SmartReference.Runtime.SmartReference<Texture2D> { path = "stub://tex" };
+
+            LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex(@"\[SmartReference\] Loaded asset at path: stub://tex is .*SmartReferenceTestSO, expected UnityEngine\.Texture2D"));
+            Assert.IsNull(r.Value);
+            Assert.AreEqual(1, stub.ReleaseCalls);
+        }
+
+        // ----------------------------
+        // 5b) Resources release
+        // ----------------------------
+
+        [Test]
+        public void Release_Prefab_Resources_NoErrors()
+        {
+            var r = new global::SmartReference.Runtime.SmartReference<GameObject> { path = AssetSetup.PrefabResourcesPath };
+            Assert.NotNull(r.Value);
+
+            r.Release();
+
+            Assert.IsFalse(r.IsLoaded);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void Release_Texture_Resources_Unloads()
+        {
+            var r = new global::SmartReference.Runtime.SmartReference<Texture2D> { path = AssetSetup.TextureResourcesPath };
+            Assert.NotNull(r.Value);
+
+            r.Release();
+
+            Assert.IsFalse(r.IsLoaded);
+            Assert.NotNull(r.Value);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [UnityTest]
+        public IEnumerator Release_DuringLoading_Resources_TaskGetsNull()
+        {
+            var r = new global::SmartReference.Runtime.SmartReference<GameObject> { path = AssetSetup.PrefabResourcesPath };
+            var t = r.LoadAsyncTask();
+
+            r.Release();
+            yield return WaitForTask(t);
+
+            Assert.IsNull(t.Result);
+            Assert.IsFalse(r.IsLoaded);
+            LogAssert.NoUnexpectedReceived();
+        }
+
         // ----------------------------
         // 6) Play session reset (Enter Play Mode with domain reload disabled)
         // ----------------------------
@@ -605,14 +716,16 @@ namespace SmartReference.Runtime.Tests
             }
 
             private readonly int delayFrames;
+            private readonly bool honorCancel;
             public int LoadCalls { get; private set; }
             public int AsyncLoadCalls { get; private set; }
             public int ReleaseCalls { get; private set; }
             public int CancelCalls { get; private set; }
 
-            public StubLoader(int delayFrames)
+            public StubLoader(int delayFrames, bool honorCancel = true)
             {
                 this.delayFrames = Mathf.Max(0, delayFrames);
+                this.honorCancel = honorCancel;
             }
 
             public ISmartReferenceHandle Load(string path, Type type, out Object loadedObject)
@@ -639,7 +752,7 @@ namespace SmartReference.Runtime.Tests
             public void Cancel(global::SmartReference.Runtime.ISmartReferenceHandle handle)
             {
                 CancelCalls++;
-                if (handle is H h) h.canceled = true;
+                if (honorCancel && handle is H h) h.canceled = true;
             }
 
             private IEnumerator DelayedComplete(H h, Type type, Action<Object> onComplete)

@@ -5,6 +5,17 @@
     "Editor"
   ],
   "references": [
-    "GUID:2102fc48d2574f839ad3bea55a14e6b8"
+    "GUID:2102fc48d2574f839ad3bea55a14e6b8",
+    "Unity.Addressables",
+    "Unity.Addressables.Editor",
+    "Unity.ResourceManager",
+    "Unity.ScriptableBuildPipeline.Editor"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.unity.addressables",
+      "expression": "",
+      "define": "SMARTREFERENCE_ADDRESSABLES_SUPPORT"
+    }
   ]
 }

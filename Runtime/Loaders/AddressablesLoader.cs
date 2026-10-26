@@ -26,14 +26,20 @@ namespace SmartReference.Runtime
 
         public ISmartReferenceHandle LoadAsync(string path, Type type, Action<Object> callback)
         {
-            var handle = Addressables.LoadAssetAsync<Object>(path);
-            handle.Completed += operation =>
+            var h = new AddressablesHandle { op = Addressables.LoadAssetAsync<Object>(path) };
+            h.op.Completed += operation =>
             {
+                if (h.canceled)
+                {
+                    Release(h);
+                    callback?.Invoke(null);
+                    return;
+                }
+
                 var result = operation.Status == AsyncOperationStatus.Succeeded ? operation.Result : null;
                 callback?.Invoke(result);
             };
-            
-            var h = new AddressablesHandle { op = handle };
+
             return h;
         }
 
@@ -48,7 +54,11 @@ namespace SmartReference.Runtime
 
         public void Cancel(ISmartReferenceHandle handle)
         {
-            
+            // Addressables can't abort a load, so release it once it completes and report null
+            if (handle is AddressablesHandle addressablesHandle)
+            {
+                addressablesHandle.canceled = true;
+            }
         }
     }
 }
