@@ -24,7 +24,23 @@ namespace SmartReference.Runtime
         #region Statics
         
         protected static ISmartReferenceLoader Loader;
-        
+
+        /// <summary>
+        /// Incremented at the start of every play session. Instances compare against it to detect state
+        /// left over from a previous session when domain reload is disabled.
+        /// </summary>
+        protected static int Session;
+
+        /// <summary>
+        /// Reset static state at the start of each play session, so it works with domain reload disabled.
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        internal static void ResetStatics()
+        {
+            Loader = null;
+            Session++;
+        }
+
         /// <summary>
         /// Use this method to initialize the loader if you want to use Resources for loading assets.
         /// </summary>
@@ -74,21 +90,42 @@ namespace SmartReference.Runtime
         
         [NonSerialized] private ISmartReferenceHandle handle;
         [NonSerialized] private bool releaseRequested;
-        
+#if UNITY_EDITOR
+        [NonSerialized] private int session;
+#endif
+
         /// <summary>
         /// Check if the asset is loaded.
         /// </summary>
-        public bool IsLoaded => value != null;
-        
+        public bool IsLoaded
+        {
+            get {
+                EnsureCurrentSession();
+                return value != null;
+            }
+        }
+
         /// <summary>
         /// Check if the asset is loading asynchronously.
         /// </summary>
-        public bool IsLoading => isLoading;
-        
+        public bool IsLoading
+        {
+            get {
+                EnsureCurrentSession();
+                return isLoading;
+            }
+        }
+
         /// <summary>
         /// Check if a release has been requested while loading.
         /// </summary>
-        public bool ReleaseRequested => releaseRequested;
+        public bool ReleaseRequested
+        {
+            get {
+                EnsureCurrentSession();
+                return releaseRequested;
+            }
+        }
 
         /// <summary>
         /// Get the asset. If the asset is not loaded, it will be loaded automatically.
@@ -96,6 +133,7 @@ namespace SmartReference.Runtime
         public T Value
         {
             get {
+                EnsureCurrentSession();
                 if (value == null) {
                     Load();
                 }
@@ -114,6 +152,8 @@ namespace SmartReference.Runtime
         /// </summary>
         public void Load()
         {
+            EnsureCurrentSession();
+
             if (string.IsNullOrEmpty(path))
             {
                 LogEmptyAssetError();
@@ -145,6 +185,8 @@ namespace SmartReference.Runtime
         /// </summary>
         public void LoadAsync()
         {
+            EnsureCurrentSession();
+
             if (value != null)
             {
                 return;
@@ -167,7 +209,8 @@ namespace SmartReference.Runtime
 
             isLoading = true;
             releaseRequested = false;
-            handle = Loader.LoadAsync(path, typeof(T), OnAsyncLoadCompleteCallback);
+            var loadSession = Session;
+            handle = Loader.LoadAsync(path, typeof(T), obj => OnAsyncLoadCompleteCallback(obj, loadSession));
         }
         
         /// <summary>
@@ -175,6 +218,8 @@ namespace SmartReference.Runtime
         /// </summary>
         public Task<T> LoadAsyncTask()
         {
+            EnsureCurrentSession();
+
             if (value != null)
             {
                 return Task.FromResult(value);
@@ -217,6 +262,8 @@ namespace SmartReference.Runtime
         /// </summary>
         public UniTask<T> LoadAsyncUniTask(CancellationToken cancellationToken)
         {
+            EnsureCurrentSession();
+
             if (value != null)
             {
                 return UniTask.FromResult(value);
@@ -253,6 +300,8 @@ namespace SmartReference.Runtime
         /// </summary>
         public void Release()
         {
+            EnsureCurrentSession();
+
             if (Loader == null)
             {
                 LogEmptyLoaderError();
@@ -318,8 +367,34 @@ namespace SmartReference.Runtime
 #endif
         }
 
-        private void OnAsyncLoadCompleteCallback(Object obj)
+        /// <summary>
+        /// Drop state cached in a previous play session. With domain reload disabled, non-serialized fields
+        /// survive between sessions on assets that stay in memory.
+        /// </summary>
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        private void EnsureCurrentSession()
         {
+#if UNITY_EDITOR
+            if (session == Session) return;
+
+            session = Session;
+            value = null;
+            handle = null;
+            isLoading = false;
+            releaseRequested = false;
+            inFlightTaskTcs = null;
+#if SMARTREFERENCE_UNITASK_SUPPORT
+            inFlightUniTaskTcs = null;
+#endif
+            OnAsyncLoadComplete = null;
+#endif
+        }
+
+        private void OnAsyncLoadCompleteCallback(Object obj, int loadSession)
+        {
+            // Completion of a load started in a previous play session, ignore it.
+            if (loadSession != Session) return;
+
             isLoading = false;
             if (obj == null)
             {

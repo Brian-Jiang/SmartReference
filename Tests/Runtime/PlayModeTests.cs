@@ -269,7 +269,96 @@ namespace SmartReference.Runtime.Tests
         }
 
         // ----------------------------
-        // 6) Performance (PlayMode microbenchmarks)
+        // 6) Play session reset (Enter Play Mode with domain reload disabled)
+        // ----------------------------
+
+        [UnityTest]
+        public IEnumerator SessionReset_DuringAsyncLoad_ClearsLoadingState()
+        {
+            var stub = new StubLoader(delayFrames: 3);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new global::SmartReference.Runtime.SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            var completeEvents = 0;
+            r.OnAsyncLoadComplete += _ => completeEvents++;
+
+            var oldTask = r.LoadAsyncTask();
+            Assert.IsTrue(r.IsLoading);
+
+            // Simulate exiting and re-entering play mode mid-load
+            global::SmartReference.Runtime.SmartReference.ResetStatics();
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            Assert.IsFalse(r.IsLoading);
+
+            var newTask = r.LoadAsyncTask();
+            Assert.AreNotSame(oldTask, newTask);
+            yield return WaitForTask(newTask);
+
+            Assert.NotNull(newTask.Result);
+            Assert.AreEqual(2, stub.AsyncLoadCalls);
+            Assert.IsFalse(oldTask.IsCompleted);
+            Assert.AreEqual(0, completeEvents);
+        }
+
+        [UnityTest]
+        public IEnumerator SessionReset_LateCallbackFromOldSession_IsIgnored()
+        {
+            var stub = new StubLoader(delayFrames: 2);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new global::SmartReference.Runtime.SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            r.LoadAsync();
+
+            global::SmartReference.Runtime.SmartReference.ResetStatics();
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            // Let the old session's load complete
+            for (int i = 0; i < 4; i++)
+                yield return null;
+
+            Assert.IsFalse(r.IsLoaded);
+            Assert.IsFalse(r.IsLoading);
+        }
+
+        [Test]
+        public void SessionReset_ClearsCachedValue()
+        {
+            var oldStub = new StubLoader(delayFrames: 0);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(oldStub);
+
+            var r = new global::SmartReference.Runtime.SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            Assert.NotNull(r.Value);
+
+            var newStub = new StubLoader(delayFrames: 0);
+            global::SmartReference.Runtime.SmartReference.ResetStatics();
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(newStub);
+
+            Assert.IsFalse(r.IsLoaded);
+            Assert.NotNull(r.Value);
+            Assert.AreEqual(1, oldStub.LoadCalls);
+            Assert.AreEqual(1, newStub.LoadCalls);
+            // Stale handles are dropped, not released through a loader that doesn't own them
+            Assert.AreEqual(0, oldStub.ReleaseCalls);
+            Assert.AreEqual(0, newStub.ReleaseCalls);
+        }
+
+        [Test]
+        public void SessionReset_ClearsLoader()
+        {
+            global::SmartReference.Runtime.SmartReference.ResetStatics();
+
+            var r = new global::SmartReference.Runtime.SmartReference<SmartReferenceTestSO>
+            {
+                path = AssetSetup.SoResourcesPath
+            };
+
+            LogAssert.Expect(LogType.Error, "[SmartReference] Loader is null, please init the SmartReference with a loader before using it.");
+            _ = r.Value;
+        }
+
+        // ----------------------------
+        // 7) Performance (PlayMode microbenchmarks)
         // ----------------------------
 
         [Test]
