@@ -62,6 +62,13 @@ var prefab = await monsterData.prefab.LoadAsyncUniTask();
 Instantiate(prefab);
 ```
 
+#### Asynchronous Loading with Awaitable (Unity 2023.2+ / Unity 6, no dependency)
+```csharp
+var prefab = await monsterData.prefab.LoadAsyncAwaitable();
+Instantiate(prefab);
+```
+Each call returns a new `Awaitable`, which must only be awaited once.
+
 #### Asynchronous Loading with C# Async/Await
 ```csharp
 var prefab = await monsterData.prefab.LoadAsyncTask();

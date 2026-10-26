@@ -3,8 +3,15 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-#if SMARTREFERENCE_UNITASK_SUPPORT
+#if UNITY_2023_2_OR_NEWER
+using System.Collections.Generic;
+#endif
+
+#if SMARTREFERENCE_UNITASK_SUPPORT || UNITY_2023_2_OR_NEWER
 using System.Threading;
+#endif
+
+#if SMARTREFERENCE_UNITASK_SUPPORT
 using Cysharp.Threading.Tasks;
 #endif
 
@@ -87,7 +94,12 @@ namespace SmartReference.Runtime
 #if SMARTREFERENCE_UNITASK_SUPPORT
         [NonSerialized] private UniTaskCompletionSource<T> inFlightUniTaskTcs;
 #endif
-        
+#if UNITY_2023_2_OR_NEWER
+        // An Awaitable can only be awaited once, so each caller gets its own waiter
+        [NonSerialized] private List<AwaitableWaiter> awaitableWaiters;
+        [NonSerialized] private List<AwaitableWaiter> spareAwaitableWaiters;
+#endif
+
         [NonSerialized] private ISmartReferenceHandle handle;
         [NonSerialized] private bool releaseRequested;
 #if UNITY_EDITOR
@@ -290,9 +302,143 @@ namespace SmartReference.Runtime
             LoadAsync();
             return inFlightUniTaskTcs.Task.AttachExternalCancellation(cancellationToken);
         }
-        
+
 #endif
-        
+
+#if UNITY_2023_2_OR_NEWER
+
+        /// <summary>
+        /// Load the asset asynchronously with Unity's Awaitable.
+        /// Every call returns a new Awaitable, which must only be awaited once.
+        /// </summary>
+        public Awaitable<T> LoadAsyncAwaitable()
+        {
+            return LoadAsyncAwaitable(CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Load the asset asynchronously with Unity's Awaitable and cancellation token.
+        /// Every call returns a new Awaitable, which must only be awaited once.
+        /// Cancelling the token only cancels this caller's await, the load itself and other callers continue.
+        /// Cancel the token from the main thread.
+        /// </summary>
+        public Awaitable<T> LoadAsyncAwaitable(CancellationToken cancellationToken)
+        {
+            EnsureCurrentSession();
+
+            if (value != null)
+            {
+                return AwaitableWaiter.FromResult(value);
+            }
+
+            if (string.IsNullOrEmpty(path))
+            {
+                LogEmptyAssetError();
+                return AwaitableWaiter.FromResult(null);
+            }
+
+            if (Loader == null)
+            {
+                LogEmptyLoaderError();
+                return AwaitableWaiter.FromResult(null);
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                LoadAsync();
+                return AwaitableWaiter.FromCanceled();
+            }
+
+            var waiter = AwaitableWaiter.Rent(this);
+            // Capture before LoadAsync, a loader may complete synchronously and recycle the waiter
+            var awaitable = waiter.Source.Awaitable;
+            if (awaitableWaiters == null)
+            {
+                awaitableWaiters = spareAwaitableWaiters ?? new List<AwaitableWaiter>();
+                spareAwaitableWaiters = null;
+            }
+
+            awaitableWaiters.Add(waiter);
+            waiter.Register(cancellationToken);
+            LoadAsync();
+            return awaitable;
+        }
+
+        /// <summary>
+        /// Pooled per-caller completion source.
+        /// </summary>
+        private sealed class AwaitableWaiter
+        {
+            private const int MaxPoolSize = 32;
+            private static readonly Stack<AwaitableWaiter> Pool = new Stack<AwaitableWaiter>();
+
+            public readonly AwaitableCompletionSource<T> Source = new AwaitableCompletionSource<T>();
+            private SmartReference<T> owner;
+            private CancellationTokenRegistration registration;
+
+            public static AwaitableWaiter Rent(SmartReference<T> owner)
+            {
+                var waiter = Pool.Count > 0 ? Pool.Pop() : new AwaitableWaiter();
+                waiter.owner = owner;
+                return waiter;
+            }
+
+            public static Awaitable<T> FromResult(T result)
+            {
+                var waiter = Rent(null);
+                waiter.Source.SetResult(result);
+                var awaitable = waiter.Source.Awaitable;
+                waiter.Return();
+                return awaitable;
+            }
+
+            public static Awaitable<T> FromCanceled()
+            {
+                var waiter = Rent(null);
+                waiter.Source.SetCanceled();
+                var awaitable = waiter.Source.Awaitable;
+                waiter.Return();
+                return awaitable;
+            }
+
+            public void Register(CancellationToken cancellationToken)
+            {
+                if (!cancellationToken.CanBeCanceled) return;
+
+                registration = cancellationToken.Register(static state => ((AwaitableWaiter) state).Cancel(), this);
+            }
+
+            public void Complete(T result)
+            {
+                Source.TrySetResult(result);
+                Return();
+            }
+
+            private void Cancel()
+            {
+                Source.TrySetCanceled();
+                
+                if (owner?.awaitableWaiters != null && owner.awaitableWaiters.Remove(this))
+                {
+                    Return();
+                }
+            }
+
+            private void Return()
+            {
+                registration.Dispose();
+                registration = default;
+                owner = null;
+                Source.Reset();
+                if (Pool.Count < MaxPoolSize)
+                {
+                    Pool.Push(this);
+                }
+            }
+        }
+
+#endif
+
         /// <summary>
         /// Release the loaded asset.
         /// Safe to call multiple times.
@@ -365,6 +511,22 @@ namespace SmartReference.Runtime
                 utcs.TrySetResult(result);
             }
 #endif
+
+#if UNITY_2023_2_OR_NEWER
+            // Awaitable
+            if (awaitableWaiters != null)
+            {
+                var waiters = awaitableWaiters;
+                awaitableWaiters = null;
+                for (var i = 0; i < waiters.Count; i++)
+                {
+                    waiters[i].Complete(result);
+                }
+
+                waiters.Clear();
+                spareAwaitableWaiters = waiters;
+            }
+#endif
         }
 
         /// <summary>
@@ -385,6 +547,9 @@ namespace SmartReference.Runtime
             inFlightTaskTcs = null;
 #if SMARTREFERENCE_UNITASK_SUPPORT
             inFlightUniTaskTcs = null;
+#endif
+#if UNITY_2023_2_OR_NEWER
+            awaitableWaiters = null;
 #endif
             OnAsyncLoadComplete = null;
 #endif

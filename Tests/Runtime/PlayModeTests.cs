@@ -6,9 +6,12 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 
-#if SMARTREFERENCE_UNITASK_SUPPORT
+#if SMARTREFERENCE_UNITASK_SUPPORT || UNITY_2023_2_OR_NEWER
 using System.Threading;
 using System.Threading.Tasks;
+#endif
+
+#if SMARTREFERENCE_UNITASK_SUPPORT
 using Cysharp.Threading.Tasks;
 #endif
 
@@ -193,6 +196,179 @@ namespace SmartReference.Runtime.Tests
             yield return null;
 
             Assert.NotNull(r.Value);
+        }
+#endif
+
+#if UNITY_2023_2_OR_NEWER
+        // ----------------------------
+        // 4b) Correctness - Awaitable path
+        // ----------------------------
+
+        [UnityTest]
+        public IEnumerator AsyncLoad_Awaitable_CompletesAndReturnsAsset()
+        {
+            var r = new SmartReference<SmartReferenceTestSO>
+            {
+                path = AssetSetup.SoResourcesPath
+            };
+
+            var task = AsTask(r.LoadAsyncAwaitable());
+            yield return WaitForTask(task);
+
+            Assert.NotNull(task.Result);
+            Assert.AreEqual(123, task.Result.number);
+        }
+
+        [UnityTest]
+        public IEnumerator InFlightSharing_Awaitable_CallsLoaderOnce_EachCallerGetsOwnAwaitable()
+        {
+            var stub = new StubLoader(delayFrames: 2);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+
+            var a1 = r.LoadAsyncAwaitable();
+            var a2 = r.LoadAsyncAwaitable();
+
+            // An Awaitable can only be awaited once, so callers must not share one
+            Assert.AreNotSame(a1, a2);
+            Assert.AreEqual(1, stub.AsyncLoadCalls);
+
+            var t1 = AsTask(a1);
+            var t2 = AsTask(a2);
+            yield return WaitForTask(t1);
+            yield return WaitForTask(t2);
+
+            Assert.NotNull(t1.Result);
+            Assert.AreSame(t1.Result, t2.Result);
+            Assert.AreEqual(1, stub.AsyncLoadCalls);
+        }
+
+        [UnityTest]
+        public IEnumerator Awaitable_CancelOneCaller_OtherStillCompletes()
+        {
+            var stub = new StubLoader(delayFrames: 3);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+
+            using var cts = new CancellationTokenSource();
+            var cancelled = AsTask(r.LoadAsyncAwaitable(cts.Token));
+            var other = AsTask(r.LoadAsyncAwaitable());
+
+            yield return null;
+            cts.Cancel();
+
+            yield return WaitForTask(cancelled);
+            Assert.IsTrue(cancelled.IsCanceled);
+
+            yield return WaitForTask(other);
+            Assert.NotNull(other.Result);
+            Assert.IsTrue(r.IsLoaded);
+            Assert.AreEqual(1, stub.AsyncLoadCalls);
+        }
+
+        [UnityTest]
+        public IEnumerator Awaitable_PreCancelledToken_CancelsAwaitButLoadCompletes()
+        {
+            var stub = new StubLoader(delayFrames: 2);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            var task = AsTask(r.LoadAsyncAwaitable(cts.Token));
+            yield return WaitForTask(task);
+            Assert.IsTrue(task.IsCanceled);
+
+            // Let the underlying callback-based load finish.
+            for (int i = 0; i < 4; i++)
+                yield return null;
+
+            Assert.IsTrue(r.IsLoaded);
+            Assert.AreEqual(1, stub.AsyncLoadCalls);
+        }
+
+        [UnityTest]
+        public IEnumerator Awaitable_AlreadyLoaded_ReturnsCompletedWithoutLoaderCall()
+        {
+            var stub = new StubLoader(delayFrames: 0);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            var loaded = r.Value;
+
+            var task = AsTask(r.LoadAsyncAwaitable());
+            yield return WaitForTask(task);
+
+            Assert.AreSame(loaded, task.Result);
+            Assert.AreEqual(0, stub.AsyncLoadCalls);
+        }
+
+        [UnityTest]
+        public IEnumerator Awaitable_ReleaseDuringLoading_CompletesWithNull()
+        {
+            var stub = new StubLoader(delayFrames: 3);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            var task = AsTask(r.LoadAsyncAwaitable());
+
+            r.Release();
+            Assert.AreEqual(1, stub.CancelCalls);
+
+            yield return WaitForTask(task);
+
+            Assert.IsNull(task.Result);
+            Assert.AreEqual(0, stub.ReleaseCalls);
+        }
+
+        [UnityTest]
+        public IEnumerator Awaitable_SessionReset_DropsWaiters()
+        {
+            var stub = new StubLoader(delayFrames: 3);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            var oldTask = AsTask(r.LoadAsyncAwaitable());
+
+            // Simulate exiting and re-entering play mode mid-load
+            global::SmartReference.Runtime.SmartReference.ResetStatics();
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var newTask = AsTask(r.LoadAsyncAwaitable());
+            yield return WaitForTask(newTask);
+
+            // Let the old session's load complete
+            for (int i = 0; i < 4; i++)
+                yield return null;
+
+            Assert.NotNull(newTask.Result);
+            Assert.AreEqual(2, stub.AsyncLoadCalls);
+            Assert.IsFalse(oldTask.IsCompleted);
+        }
+
+        [UnityTest]
+        public IEnumerator Awaitable_ReentrantLoadFromContinuation_Works()
+        {
+            var stub = new StubLoader(delayFrames: 1);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+
+            // The first waiter's continuation releases and reloads while the other waiter is still being completed
+            var reloaded = LoadReleaseAndReload(r);
+            var other = AsTask(r.LoadAsyncAwaitable());
+
+            yield return WaitForTask(other);
+            yield return WaitForTask(reloaded);
+
+            Assert.NotNull(other.Result);
+            Assert.NotNull(reloaded.Result);
+            Assert.AreEqual(2, stub.AsyncLoadCalls);
+            Assert.AreEqual(1, stub.ReleaseCalls);
         }
 #endif
 
@@ -400,6 +576,22 @@ namespace SmartReference.Runtime.Tests
             if (task.IsFaulted)
                 throw task.Exception!;
         }
+
+#if UNITY_2023_2_OR_NEWER
+        // Each Awaitable is awaited exactly once, here
+        private static async Task<T> AsTask<T>(Awaitable<T> awaitable)
+        {
+            return await awaitable;
+        }
+
+        private static async Task<T> LoadReleaseAndReload<T>(SmartReference<T> r) where T : Object
+        {
+            var first = await r.LoadAsyncAwaitable();
+            Assert.NotNull(first);
+            r.Release();
+            return await r.LoadAsyncAwaitable();
+        }
+#endif
 
         /// <summary>
         /// Stub loader that simulates async loading + handle-based release/cancel.
