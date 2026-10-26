@@ -115,37 +115,31 @@ namespace SmartReference.Editor
         {
             List<Type> result = new List<Type>();
 
-            // Iterating over all assemblies
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            // Iterating over all UnityEngine.Object subclasses known to the editor
+            foreach (var type in TypeCache.GetTypesDerivedFrom<UnityEngine.Object>())
             {
                 // Optional: Filter the assemblies by name if necessary
-                var fullName = assembly.FullName;
+                var fullName = type.Assembly.FullName;
                 if (fullName.StartsWith("UnityEngine.") || fullName.StartsWith("UnityEditor.") ||
                     fullName.StartsWith("Unity.") || fullName.StartsWith("Bee.") ||
                     fullName.StartsWith("System.") || fullName.StartsWith("Mono.")) continue;
 
-                foreach (var type in assembly.GetTypes())
+                // Safeguard against types that might throw exceptions
+                try
                 {
-                    // Safeguard against types that might throw exceptions
-                    try
+                    foreach (FieldInfo field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
                     {
-                        if (type.IsSubclassOf(typeof(UnityEngine.Object)))
+                        if (fieldType.IsAssignableFrom(field.FieldType))
                         {
-                            foreach (FieldInfo field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
-                            {
-                                if (fieldType.IsAssignableFrom(field.FieldType))
-                                {
-                                    result.Add(type);
-                                    break;
-                                }
-                            }
+                            result.Add(type);
+                            break;
                         }
                     }
-                    catch
-                    {
-                        // In some cases, attempting to inspect a type might throw an exception.
-                        // Just catch and ignore.
-                    }
+                }
+                catch
+                {
+                    // In some cases, attempting to inspect a type might throw an exception.
+                    // Just catch and ignore.
                 }
             }
 
