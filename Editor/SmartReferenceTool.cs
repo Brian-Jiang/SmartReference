@@ -23,7 +23,7 @@ namespace SmartReference.Editor
             
             var typeProp = smartReferenceProperty.FindPropertyRelative("type");
             var type = Type.GetType(typeProp.stringValue);
-            if (obj.GetType() != type)
+            if (type == null || !type.IsInstanceOfType(obj))
             {
                 throw new ArgumentException($"Object type does not match SmartReference type. Expected: {type}, Actual: {obj.GetType()}");
             }

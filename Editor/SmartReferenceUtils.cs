@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SmartReference.Editor
 {
@@ -46,20 +47,17 @@ namespace SmartReference.Editor
             if (smartReference == null || string.IsNullOrEmpty(smartReference.guid)) return;
 
             var succeed = false;
-            // Update path with guid and fileID
-            var objects = AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GUIDToAssetPath(smartReference.guid));
-            foreach (var obj in objects) {
-                if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(obj, out _, out long objFileID) && 
-                    smartReference.fileID == objFileID) {
-                    smartReference.path = AssetDatabase.GetAssetPath(obj);
-                    succeed = true;
-                    break;
-                }
-            }
             
+            // Update path with guid and fileID
+            var found = FindAsset(smartReference.guid, smartReference.fileID);
+            if (found != null) {
+                smartReference.path = AssetDatabase.GetAssetPath(found);
+                succeed = true;
+            }
+
             // if failed, try to update guid and fileID with path
             if (!succeed) {
-                var obj = AssetDatabase.LoadAssetAtPath(smartReference.path, Type.GetType(smartReference.type));
+                var obj = AssetDatabase.LoadAssetAtPath(smartReference.path, GetTypeOrObject(smartReference.type));
                 if (obj != null && AssetDatabase.TryGetGUIDAndLocalFileIdentifier(obj, out var guid, out long objFileID)) {
                     smartReference.guid = AssetDatabase.AssetPathToGUID(smartReference.path);
                     smartReference.fileID = objFileID;
@@ -84,20 +82,17 @@ namespace SmartReference.Editor
             var pathProp = property.FindPropertyRelative("path");
             var typeProp = property.FindPropertyRelative("type");
             var succeed = false;
-            // Update path with guid and fileID
-            var objects = AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GUIDToAssetPath(guidProp.stringValue));
-            foreach (var obj in objects) {
-                if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(obj, out _, out long objFileID) && 
-                    fileIDProp.longValue == objFileID) {
-                    pathProp.stringValue = AssetDatabase.GetAssetPath(obj);
-                    succeed = true;
-                    break;
-                }
-            }
             
+            // Update path with guid and fileID
+            var found = FindAsset(guidProp.stringValue, fileIDProp.longValue);
+            if (found != null) {
+                pathProp.stringValue = AssetDatabase.GetAssetPath(found);
+                succeed = true;
+            }
+
             // if failed, try to update guid and fileID with path
             if (!succeed) {
-                var obj = AssetDatabase.LoadAssetAtPath(pathProp.stringValue, Type.GetType(typeProp.stringValue));
+                var obj = AssetDatabase.LoadAssetAtPath(pathProp.stringValue, GetTypeOrObject(typeProp.stringValue));
                 if (obj != null && AssetDatabase.TryGetGUIDAndLocalFileIdentifier(obj, out var guid, out long objFileID)) {
                     guidProp.stringValue = AssetDatabase.AssetPathToGUID(pathProp.stringValue);
                     fileIDProp.longValue = objFileID;
@@ -110,7 +105,88 @@ namespace SmartReference.Editor
                 Debug.LogError($"[SmartReference] Failed to update smart reference, path: {pathProp.stringValue}");
             }
         }
+
+        private static readonly Dictionary<(string guid, long fileID), Object> AssetCache = new();
+
+        [InitializeOnLoadMethod]
+        private static void RegisterAssetCacheInvalidation()
+        {
+            EditorApplication.projectChanged += AssetCache.Clear;
+        }
         
+        internal static Object FindAsset(string guid, long fileID)
+        {
+            if (string.IsNullOrEmpty(guid)) return null;
+
+            var key = (guid, fileID);
+            // A cached object can be destroyed without a project change, e.g. a deleted sub asset
+            if (AssetCache.TryGetValue(key, out var cached) && (cached != null || ReferenceEquals(cached, null))) {
+                return cached;
+            }
+
+            Object result = null;
+            var objects = AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GUIDToAssetPath(guid));
+            foreach (var obj in objects) {
+                if (obj != null && AssetDatabase.TryGetGUIDAndLocalFileIdentifier(obj, out _, out long objFileID) &&
+                    fileID == objFileID) {
+                    result = obj;
+                    break;
+                }
+            }
+
+            AssetCache[key] = result;
+            return result;
+        }
+        
+        internal static Object ResolveReference(SerializedProperty property)
+        {
+            var guid = property.FindPropertyRelative("guid").stringValue;
+            if (string.IsNullOrEmpty(guid)) return null;
+
+            var obj = FindAsset(guid, property.FindPropertyRelative("fileID").longValue);
+            if (obj != null) return obj;
+
+            var path = property.FindPropertyRelative("path").stringValue;
+            if (string.IsNullOrEmpty(path)) return null;
+
+            return AssetDatabase.LoadAssetAtPath(path, GetTypeOrObject(property.FindPropertyRelative("type").stringValue));
+        }
+        
+        internal static Type GetReferencedType(FieldInfo fieldInfo, SerializedProperty property)
+        {
+            var fieldType = fieldInfo?.FieldType;
+            if (fieldType != null) {
+                if (fieldType.IsArray) {
+                    fieldType = fieldType.GetElementType();
+                }
+                else if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(List<>)) {
+                    fieldType = fieldType.GetGenericArguments()[0];
+                }
+
+                for (var t = fieldType; t != null; t = t.BaseType) {
+                    if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Runtime.SmartReference<>)) {
+                        return t.GetGenericArguments()[0];
+                    }
+                }
+            }
+
+            return GetTypeOrObject(property.FindPropertyRelative("type").stringValue);
+        }
+        
+        internal static string GetLabel(SerializedProperty property, string label)
+        {
+            var path = property.propertyPath;
+            if (!path.EndsWith("]")) return label;
+
+            var start = path.LastIndexOf('[') + 1;
+            return $"Element {path.Substring(start, path.Length - start - 1)}";
+        }
+
+        private static Type GetTypeOrObject(string typeName)
+        {
+            return (string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName)) ?? typeof(Object);
+        }
+
         private static List<Type> GetTypesWithSpecificField(Type fieldType)
         {
             List<Type> result = new List<Type>();

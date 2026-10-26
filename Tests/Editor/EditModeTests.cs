@@ -1,13 +1,12 @@
-﻿// SmartReferenceTool_EditModeTests.cs
-// Put in an EditMode test assembly, e.g.
-// Assets/Tests/EditMode/SmartReference/SmartReferenceTool_EditModeTests.cs
-// or Packages/com.yourname.smartreference/Tests/EditMode/SmartReferenceTool_EditModeTests.cs
-
-using System;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using SmartReference.Runtime;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.TestTools;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace SmartReference.Editor.Tests
@@ -16,6 +15,7 @@ namespace SmartReference.Editor.Tests
     {
         private const string RootFolder = "Assets/SmartReferenceTool_EditModeTestAssets";
         private const string SoAssetPath = RootFolder + "/TestAsset.asset";
+        private const string UnknownGuid = "0123456789abcdef0123456789abcdef";
 
         private TestContainerSO container;
         private SerializedObject serializedContainer;
@@ -223,6 +223,103 @@ namespace SmartReference.Editor.Tests
             Assert.AreEqual(smartRefProp.FindPropertyRelative("path").stringValue, prop2.FindPropertyRelative("path").stringValue);
         }
 
+        [Test]
+        public void SetReference_AcceptsSubclassAsset()
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<TestAssetSO>(SoAssetPath);
+            var baseRefProp = serializedContainer.FindProperty("refToBase");
+            baseRefProp.FindPropertyRelative("type").stringValue = typeof(ScriptableObject).AssemblyQualifiedName;
+
+            SmartReferenceTool.SetReference(baseRefProp, asset);
+
+            Assert.AreEqual(SoAssetPath, baseRefProp.FindPropertyRelative("path").stringValue);
+        }
+
+        // ---------------------------
+        // ResolveReference
+        // ---------------------------
+
+        [Test]
+        public void ResolveReference_FindsAssetByGuidAndFileId()
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<TestAssetSO>(SoAssetPath);
+            SmartReferenceTool.SetReference(smartRefProp, asset);
+
+            Assert.AreEqual(asset, SmartReferenceUtils.ResolveReference(smartRefProp));
+        }
+
+        [Test]
+        public void ResolveReference_WhenGuidIsUnknown_FallsBackToPath()
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<TestAssetSO>(SoAssetPath);
+            SmartReferenceTool.SetReference(smartRefProp, asset);
+            smartRefProp.FindPropertyRelative("guid").stringValue = UnknownGuid;
+
+            Assert.AreEqual(asset, SmartReferenceUtils.ResolveReference(smartRefProp));
+        }
+
+        [Test]
+        public void ResolveReference_WhenMissing_ReturnsNullWithoutWritingOrLogging()
+        {
+            smartRefProp.FindPropertyRelative("guid").stringValue = UnknownGuid;
+            smartRefProp.FindPropertyRelative("fileID").longValue = 11400000;
+            smartRefProp.FindPropertyRelative("path").stringValue = RootFolder + "/Missing.asset";
+            serializedContainer.ApplyModifiedPropertiesWithoutUndo();
+
+            Assert.IsNull(SmartReferenceUtils.ResolveReference(smartRefProp));
+            Assert.AreEqual(UnknownGuid, smartRefProp.FindPropertyRelative("guid").stringValue);
+            Assert.IsFalse(serializedContainer.hasModifiedProperties);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        // ---------------------------
+        // Drawer
+        // ---------------------------
+
+        [Test]
+        public void Drawer_CreatesFieldForEachListElementWithoutModifying()
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<TestAssetSO>(SoAssetPath);
+            Assert.IsTrue(AssetDatabase.TryGetGUIDAndLocalFileIdentifier(asset, out var guid, out long fileID));
+            container.refList = new List<SmartReference<TestAssetSO>>();
+            for (var i = 0; i < 3; i++) {
+                container.refList.Add(new SmartReference<TestAssetSO> { guid = guid, fileID = fileID, path = SoAssetPath });
+            }
+
+            var so = new SerializedObject(container);
+            var listProp = so.FindProperty("refList");
+            var dirtyCount = EditorUtility.GetDirtyCount(container);
+
+            // One drawer instance for all elements, like Unity does for lists
+            var drawer = new SmartReferenceEditor();
+            for (var i = 0; i < listProp.arraySize; i++) {
+                var root = drawer.CreatePropertyGUI(listProp.GetArrayElementAtIndex(i));
+                var field = root.Q<ObjectField>();
+                Assert.NotNull(field);
+                Assert.AreEqual(asset, field.value);
+                Assert.AreEqual(typeof(TestAssetSO), field.objectType);
+                Assert.AreEqual($"Element {i}", field.label);
+            }
+
+            Assert.IsFalse(so.hasModifiedProperties);
+            Assert.AreEqual(dirtyCount, EditorUtility.GetDirtyCount(container));
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void Drawer_RepairsStalePath()
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<TestAssetSO>(SoAssetPath);
+            SmartReferenceTool.SetReference(smartRefProp, asset);
+            smartRefProp.FindPropertyRelative("path").stringValue = RootFolder + "/OldName.asset";
+            serializedContainer.ApplyModifiedPropertiesWithoutUndo();
+
+            new SmartReferenceEditor().CreatePropertyGUI(smartRefProp);
+
+            Assert.AreEqual(SoAssetPath, container.refToAsset.path);
+            LogAssert.NoUnexpectedReceived();
+        }
+
         // ---------------------------
         // Local test types
         // ---------------------------
@@ -240,6 +337,8 @@ namespace SmartReference.Editor.Tests
         {
             public SmartReference<TestAssetSO> refToAsset;
             public SmartReference<GameObject> refToGameObject;
+            public SmartReference<ScriptableObject> refToBase;
+            public List<SmartReference<TestAssetSO>> refList;
             public Object notARef;
         }
 
