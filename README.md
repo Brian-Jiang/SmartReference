@@ -1,5 +1,5 @@
 # Smart Reference
-#### version 2.0.0
+#### version 2.1.0
 
 [![DocFX Build and Publish](https://github.com/Brian-Jiang/SmartReference/actions/workflows/docfx-build-publish.yml/badge.svg?branch=main)](https://github.com/Brian-Jiang/SmartReference/actions/workflows/docfx-build-publish.yml)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Brian-Jiang/SmartReference?label=github&style=flat-square)](https://github.com/Brian-Jiang/SmartReference/releases)
@@ -36,21 +36,23 @@ public class MonsterData : ScriptableObject
 Choose the loader that matches your project setup.
 #### Addressables (recommended)
 ```csharp
-using SmartReference.Runtime;
+using SR = SmartReference.Runtime.SmartReference;
 
-SmartReference.InitWithAddressablesLoader();
+SR.InitWithAddressablesLoader();
 ```
 
 #### Resources
 ```csharp
-using SmartReference.Runtime;
+using SR = SmartReference.Runtime.SmartReference;
 
-SmartReference.InitWithResourcesLoader();
+SR.InitWithResourcesLoader();
 ```
 
 #### Custom Loader
 ```csharp
-SmartReference.InitWithCustomLoader(new MyCustomLoader());
+using SR = SmartReference.Runtime.SmartReference;
+
+SR.InitWithCustomLoader(new MyCustomLoader());
 ```
 
 Initialization must happen once, before any `SmartReference` is accessed.
@@ -61,6 +63,13 @@ Initialization must happen once, before any `SmartReference` is accessed.
 var prefab = await monsterData.prefab.LoadAsyncUniTask();
 Instantiate(prefab);
 ```
+
+#### Asynchronous Loading with Awaitable (Unity 2023.2+ / Unity 6, no dependency)
+```csharp
+var prefab = await monsterData.prefab.LoadAsyncAwaitable();
+Instantiate(prefab);
+```
+Each call returns a new `Awaitable`, which must only be awaited once.
 
 #### Asynchronous Loading with C# Async/Await
 ```csharp
@@ -79,9 +88,15 @@ monsterData.prefab.LoadAsync();
 
 #### Synchronous Loading
 ```csharp
-var prefab = monsterData.prefab.Load();
+var prefab = monsterData.prefab.Value;
 Instantiate(prefab);
 ```
+`Value` loads the asset on first access. You can also call `Load()` ahead of time and read `Value` later.
+
+### 4. Keep references up to date in builds
+Smart Reference stores the asset path next to its GUID. Before each player build, the paths of all references in assets, prefabs and scenes are updated, so moved or renamed assets still load. You can also run it from **Tools > SmartReference > Update All References**.
+
+Addressables content builds don't run player build callbacks. To update references before them, create **Assets > Create > Addressables > Content Builders > SmartReference Packed Mode**, add it to **Build and Play Mode Scripts** in your Addressables settings, and select it as the build script.
 
 ## Supports
 If you have questions or feedback:

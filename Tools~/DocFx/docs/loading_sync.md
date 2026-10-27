@@ -18,14 +18,14 @@ public class SyncLoadExample : MonoBehaviour
 
     void Start()
     {
-        var texture = icon.Load();
+        var texture = icon.Value;
 
-        var instance = Instantiate(prefab);
+        var instance = Instantiate(prefab.Value);
     }
 }
 ```
 
-When Load() is called, Smart Reference delegates the request to the active loader and blocks until the asset is available.
+When `Value` is first read, or `Load()` is called, Smart Reference delegates the request to the active loader and blocks until the asset is available.
 
 ## When to Use Synchronous Loading
 Synchronous loading is appropriate when loading cost is negligible or when blocking is acceptable. Typical use cases include early initialization code, and small assets such as icons or configuration data.

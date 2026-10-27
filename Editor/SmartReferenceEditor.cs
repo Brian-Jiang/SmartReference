@@ -1,6 +1,10 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2022_2_OR_NEWER
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
+#endif
 using Object = UnityEngine.Object;
 
 namespace SmartReference.Editor
@@ -8,49 +12,96 @@ namespace SmartReference.Editor
     [CustomPropertyDrawer(typeof(Runtime.SmartReference), true)]
     internal class SmartReferenceEditor: PropertyDrawer
     {
-        private SerializedProperty cacheProperty;
-        private Object referencedObject;
-        private SerializedProperty guidProp;
-        private SerializedProperty fileIDProp;
-        private SerializedProperty pathProp;
-        private SerializedProperty typeProp;
+#if UNITY_2022_2_OR_NEWER
+        public override VisualElement CreatePropertyGUI(SerializedProperty property)
+        {
+            RepairStalePath(property);
+
+            var root = new VisualElement();
+            var field = new ObjectField(SmartReferenceUtils.GetLabel(property, preferredLabel)) {
+                objectType = SmartReferenceUtils.GetReferencedType(fieldInfo, property),
+                allowSceneObjects = false,
+            };
+            field.AddToClassList(ObjectField.alignedFieldUssClassName);
+            var missingBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
+            root.Add(field);
+            root.Add(missingBox);
+
+            void Refresh()
+            {
+                var referenced = SmartReferenceUtils.ResolveReference(property);
+                field.SetValueWithoutNotify(referenced);
+                DrawerUtils.UpdatePropertyStyle(field, property);
+
+                var hasGuid = !string.IsNullOrEmpty(property.FindPropertyRelative("guid").stringValue);
+                var missing = referenced == null && hasGuid && !property.hasMultipleDifferentValues;
+                missingBox.text = $"Referenced asset is missing, path: {property.FindPropertyRelative("path").stringValue}";
+                missingBox.style.display = missing ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+
+            Refresh();
+            
+            field.TrackPropertyValue(property, _ => Refresh());
+            field.RegisterValueChangedCallback(evt => {
+                SetReference(property, evt.newValue);
+                Refresh();
+            });
+            DrawerUtils.AddPrefabOverrideMenu(field, property);
+            DrawerUtils.AddPrefabOverrideBar(field, property);
+            return root;
+        }
+
+        private static void RepairStalePath(SerializedProperty property)
+        {
+            var serializedObject = property.serializedObject;
+            if (serializedObject.isEditingMultipleObjects) return;
+            if (property.isInstantiatedPrefab && !property.prefabOverride) return;
+
+            var guid = property.FindPropertyRelative("guid").stringValue;
+            if (string.IsNullOrEmpty(guid)) return;
+
+            var obj = SmartReferenceUtils.FindAsset(guid, property.FindPropertyRelative("fileID").longValue);
+            if (obj == null) return;
+
+            var pathProp = property.FindPropertyRelative("path");
+            var path = AssetDatabase.GetAssetPath(obj);
+            if (pathProp.stringValue == path) return;
+
+            pathProp.stringValue = path;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        }
+#endif
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (!SerializedProperty.EqualContents(property, cacheProperty)) {
-                cacheProperty = property;
-                referencedObject = null;
-                guidProp = property.FindPropertyRelative("guid");
-                fileIDProp = property.FindPropertyRelative("fileID");
-                pathProp = property.FindPropertyRelative("path");
-                typeProp = property.FindPropertyRelative("type");
-                SmartReferenceUtils.UpdateReferenceWithProperty(property);
-                if (!string.IsNullOrEmpty(guidProp.stringValue)) {
-                    var guid = guidProp.stringValue;
-                    var fileID = fileIDProp.longValue;
-                    
-                    var objects = AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GUIDToAssetPath(guid));
-                    foreach (var obj in objects) {
-                        var succeed = AssetDatabase.TryGetGUIDAndLocalFileIdentifier(obj, out _, out long objFileID);
-                        if (succeed && fileID == objFileID) {
-                            referencedObject = obj;
-                            break;
-                        }
-                    }
-                }
+            label = EditorGUI.BeginProperty(position, label, property);
+            label.text = SmartReferenceUtils.GetLabel(property, label.text);
+
+            var type = SmartReferenceUtils.GetReferencedType(fieldInfo, property);
+            var referenced = SmartReferenceUtils.ResolveReference(property);
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.showMixedValue = property.hasMultipleDifferentValues;
+            var newReferenced = EditorGUI.ObjectField(position, label, referenced, type, false);
+            EditorGUI.showMixedValue = false;
+            if (EditorGUI.EndChangeCheck()) {
+                SetReference(property, newReferenced);
             }
-            
-            var type = Type.GetType(typeProp.stringValue);
-            var newReferenced = EditorGUI.ObjectField(position, label, referencedObject, type, false);
-            if (referencedObject != newReferenced) {
-                referencedObject = newReferenced;
-                if (newReferenced == null) {
-                    SmartReferenceTool.ClearReference(property);
-                }
-                else
-                {
-                    SmartReferenceTool.SetReference(property, newReferenced);
-                }
+
+            EditorGUI.EndProperty();
+        }
+
+        private void SetReference(SerializedProperty property, Object obj)
+        {
+            var typeProp = property.FindPropertyRelative("type");
+            if (string.IsNullOrEmpty(typeProp.stringValue)) {
+                typeProp.stringValue = SmartReferenceUtils.GetReferencedType(fieldInfo, property).AssemblyQualifiedName;
+            }
+
+            try {
+                SmartReferenceTool.SetReference(property, obj);
+            }
+            catch (ArgumentException e) {
+                Debug.LogError($"[SmartReference] {e.Message}");
             }
         }
     }

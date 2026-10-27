@@ -28,21 +28,27 @@ namespace SmartReference.Runtime
             {
                 if (resourcesHandle.loadedObject != null)
                 {
-                    Resources.UnloadAsset(resourcesHandle.loadedObject);
+                    Unload(resourcesHandle.loadedObject);
                 } else if (resourcesHandle.request != null)
                 {
-                    var loadedAsset = resourcesHandle.request.asset;
-                    if (loadedAsset != null)
-                    {
-                        Resources.UnloadAsset(loadedAsset);
-                    }
+                    Unload(resourcesHandle.request.asset);
                 }
             }
         }
 
         public void Cancel(ISmartReferenceHandle handle)
         {
-            
+
+        }
+
+        private static void Unload(Object asset)
+        {
+            if (asset == null) return;
+
+            // Unity can't unload these individually, they are freed by Resources.UnloadUnusedAssets
+            if (asset is GameObject or Component or AssetBundle) return;
+
+            Resources.UnloadAsset(asset);
         }
 
         private static string GetResourcesPath(string path)

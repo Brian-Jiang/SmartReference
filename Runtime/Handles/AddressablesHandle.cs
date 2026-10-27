@@ -8,6 +8,7 @@ namespace SmartReference.Runtime
     public class AddressablesHandle : ISmartReferenceHandle
     {
         public AsyncOperationHandle<Object> op;
+        public bool canceled;
         public bool IsValid => op.IsValid();
     }
 }

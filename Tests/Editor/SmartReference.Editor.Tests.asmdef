@@ -5,7 +5,8 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "SmartReference.Runtime",
-        "SmartReference.Editor"
+        "SmartReference.Editor",
+        "SmartReference.Runtime.Tests"
     ],
     "includePlatforms": [
         "Editor"

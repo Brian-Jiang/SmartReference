@@ -1,85 +1,201 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2022_2_OR_NEWER
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
+#endif
+#if UNITY_6000_0_OR_NEWER
+using UnityEditor.Build.Profile;
+#endif
 
 namespace SmartReference.Editor
 {
     [CustomPropertyDrawer(typeof(Runtime.SceneReference), true)]
     internal class SceneReferenceEditor: PropertyDrawer
     {
-        private SerializedProperty cacheProperty;
-        private SceneAsset currentScene;
-        private SerializedProperty scenePathProp;
-        
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+#if UNITY_2022_2_OR_NEWER
+        public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            if (!SerializedProperty.EqualContents(property, cacheProperty)) {
-                cacheProperty = property;
-                scenePathProp = property.FindPropertyRelative("scenePath");
-                currentScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePathProp.stringValue);
-            }
-            
-            EditorGUI.BeginChangeCheck();
-            var sceneRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-            var newScene = EditorGUI.ObjectField(sceneRect, property.displayName, currentScene, typeof(SceneAsset), false) as SceneAsset;
-            if (EditorGUI.EndChangeCheck())
+            var scenePathProp = property.FindPropertyRelative("scenePath");
+
+            var root = new VisualElement();
+            var field = new ObjectField(SmartReferenceUtils.GetLabel(property, preferredLabel)) {
+                objectType = typeof(SceneAsset),
+                allowSceneObjects = false,
+            };
+            field.AddToClassList(ObjectField.alignedFieldUssClassName);
+            var statusBox = new HelpBox();
+            var fixButton = new Button { text = "Fix" };
+            root.Add(field);
+            root.Add(statusBox);
+            root.Add(fixButton);
+
+            void RefreshStatus()
             {
-                currentScene = newScene;
-                var newPath = AssetDatabase.GetAssetPath(newScene);
-                scenePathProp.stringValue = newPath;
+                var hasStatus = GetSceneStatus(scenePathProp.stringValue, out var message, out var fixable);
+                var showStatus = hasStatus && !property.hasMultipleDifferentValues;
+                statusBox.style.display = showStatus ? DisplayStyle.Flex : DisplayStyle.None;
+                fixButton.style.display = showStatus && fixable ? DisplayStyle.Flex : DisplayStyle.None;
+                if (!showStatus) return;
+
+                statusBox.text = message;
+                statusBox.messageType = fixable ? HelpBoxMessageType.Warning : HelpBoxMessageType.Info;
             }
 
-            var buildSettingsScenes = EditorBuildSettings.scenes;
-            var scenePath = scenePathProp.stringValue;
-            var sceneInBuildSettings = buildSettingsScenes.Any(t => t.path == scenePath);
-            var sceneEnabled = buildSettingsScenes.Any(t => t.path == scenePath && t.enabled);
-            if (!sceneInBuildSettings || !sceneEnabled) {
-                var warningRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight, position.width, 
-                    EditorGUIUtility.singleLineHeight);
-                if (!sceneInBuildSettings) {
-                    EditorGUI.HelpBox(warningRect, "Scene is not in build settings", MessageType.Warning);
+            void Refresh()
+            {
+                field.SetValueWithoutNotify(AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePathProp.stringValue));
+                DrawerUtils.UpdatePropertyStyle(field, property);
+                RefreshStatus();
+            }
+
+            Refresh();
+            
+            field.TrackPropertyValue(property, _ => Refresh());
+            field.RegisterValueChangedCallback(evt => {
+                scenePathProp.stringValue = AssetDatabase.GetAssetPath(evt.newValue);
+                property.serializedObject.ApplyModifiedProperties();
+                Refresh();
+            });
+            DrawerUtils.AddPrefabOverrideMenu(field, property);
+            DrawerUtils.AddPrefabOverrideBar(field, property);
+            fixButton.clicked += () => {
+                // The button may be stale, check the current value again before changing the scene list
+                property.serializedObject.Update();
+                if (!property.hasMultipleDifferentValues && GetSceneStatus(scenePathProp.stringValue, out _, out var fixable) && fixable) {
+                    FixScene(scenePathProp.stringValue);
                 }
-                else {
-                    EditorGUI.HelpBox(warningRect, "Scene is not enabled in build settings", MessageType.Warning);
-                }
-                
-                var fixRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * 2, position.width, 
-                    EditorGUIUtility.singleLineHeight);
-                if (GUI.Button(fixRect, "Fix")) {
-                    if (!sceneInBuildSettings) {
-                        var newScenes = buildSettingsScenes.ToList();
-                        newScenes.Add(new EditorBuildSettingsScene(scenePath, true));
-                        EditorBuildSettings.scenes = newScenes.ToArray();
-                    }
-                    else {
-                        var newScenes = buildSettingsScenes.ToList();
-                        var index = newScenes.FindIndex(t => t.path == scenePath);
-                        newScenes[index] = new EditorBuildSettingsScene(scenePath, true);
-                        EditorBuildSettings.scenes = newScenes.ToArray();
-                    }
-                }
-            } else {
-                var tipRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight, position.width, 
-                    EditorGUIUtility.singleLineHeight);
-                var newScenes = buildSettingsScenes.ToList();
-                var index = newScenes.FindIndex(t => t.path == scenePath);
-                EditorGUI.HelpBox(tipRect, $"Index in build setting: {index}", MessageType.Info);
+                RefreshStatus();
+            };
+
+            // Build profile scene lists have no change event, so poll as well. Scheduled items pause while detached.
+            Action onSceneListChanged = RefreshStatus;
+            root.RegisterCallback<AttachToPanelEvent>(_ => EditorBuildSettings.sceneListChanged += onSceneListChanged);
+            root.RegisterCallback<DetachFromPanelEvent>(_ => EditorBuildSettings.sceneListChanged -= onSceneListChanged);
+            root.schedule.Execute(RefreshStatus).Every(1000);
+            return root;
+        }
+#endif
+
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            var scenePathProp = property.FindPropertyRelative("scenePath");
+            var sceneRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+
+            label = EditorGUI.BeginProperty(sceneRect, label, property);
+            label.text = SmartReferenceUtils.GetLabel(property, label.text);
+            var currentScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePathProp.stringValue);
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.showMixedValue = property.hasMultipleDifferentValues;
+            var newScene = EditorGUI.ObjectField(sceneRect, label, currentScene, typeof(SceneAsset), false) as SceneAsset;
+            EditorGUI.showMixedValue = false;
+            if (EditorGUI.EndChangeCheck()) {
+                scenePathProp.stringValue = AssetDatabase.GetAssetPath(newScene);
+            }
+            EditorGUI.EndProperty();
+
+            var hasStatus = GetSceneStatus(scenePathProp.stringValue, out var message, out var fixable);
+            if (!hasStatus || property.hasMultipleDifferentValues) return;
+
+            var statusRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight, position.width,
+                EditorGUIUtility.singleLineHeight);
+            EditorGUI.HelpBox(statusRect, message, fixable ? MessageType.Warning : MessageType.Info);
+            if (!fixable) return;
+
+            var fixRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * 2, position.width,
+                EditorGUIUtility.singleLineHeight);
+            if (GUI.Button(fixRect, "Fix")) {
+                FixScene(scenePathProp.stringValue);
             }
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             var height = EditorGUIUtility.singleLineHeight;
-            var scenePath = property.FindPropertyRelative("scenePath").stringValue;
-            var buildSettingsScenes = EditorBuildSettings.scenes;
-            var sceneInBuildSettings = buildSettingsScenes.Any(t => t.path == scenePath && t.enabled);
-            if (!sceneInBuildSettings) {
-                height += EditorGUIUtility.singleLineHeight * 2;
-            } else {
-                height += EditorGUIUtility.singleLineHeight;
+            var hasStatus = GetSceneStatus(property.FindPropertyRelative("scenePath").stringValue, out _, out var fixable);
+            if (!hasStatus || property.hasMultipleDifferentValues) return height;
+
+            return height + EditorGUIUtility.singleLineHeight * (fixable ? 2 : 1);
+        }
+        
+        internal static bool GetSceneStatus(string scenePath, out string message, out bool fixable)
+        {
+            message = null;
+            fixable = false;
+            if (string.IsNullOrEmpty(scenePath)) return false;
+
+            if (!SceneExists(scenePath)) {
+                message = $"Scene asset is missing, path: {scenePath}";
+                return true;
             }
-            
-            return height;
+
+            var buildScenes = GetBuildScenes(out var listName);
+            var sceneInBuildSettings = buildScenes.Any(t => t.path == scenePath);
+            var sceneEnabled = buildScenes.Any(t => t.path == scenePath && t.enabled);
+            if (!sceneInBuildSettings) {
+                message = $"Scene is not in {listName}";
+                fixable = true;
+            }
+            else if (!sceneEnabled) {
+                message = $"Scene is not enabled in {listName}";
+                fixable = true;
+            }
+            else {
+                // Runtime build indices only count enabled scenes
+                var index = buildScenes.Where(t => t.enabled).ToList().FindIndex(t => t.path == scenePath);
+                message = $"Index in {listName}: {index}";
+            }
+
+            return true;
+        }
+
+        internal static void FixScene(string scenePath)
+        {
+            if (string.IsNullOrEmpty(scenePath) || !SceneExists(scenePath)) return;
+
+            var newScenes = GetBuildScenes(out _).ToList();
+            var index = newScenes.FindIndex(t => t.path == scenePath);
+            if (index < 0) {
+                newScenes.Add(new EditorBuildSettingsScene(scenePath, true));
+            }
+            else {
+                newScenes[index] = new EditorBuildSettingsScene(scenePath, true);
+            }
+            SetBuildScenes(newScenes.ToArray());
+        }
+
+        private static bool SceneExists(string scenePath)
+        {
+            return AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath) != null;
+        }
+
+        internal static EditorBuildSettingsScene[] GetBuildScenes(out string listName)
+        {
+#if UNITY_6000_0_OR_NEWER
+            var profile = BuildProfile.GetActiveBuildProfile();
+            if (profile != null && profile.overrideGlobalScenes) {
+                listName = $"build profile '{profile.name}'";
+                return profile.scenes ?? Array.Empty<EditorBuildSettingsScene>();
+            }
+#endif
+            listName = "build settings";
+            return EditorBuildSettings.scenes;
+        }
+
+        internal static void SetBuildScenes(EditorBuildSettingsScene[] scenes)
+        {
+#if UNITY_6000_0_OR_NEWER
+            var profile = BuildProfile.GetActiveBuildProfile();
+            if (profile != null && profile.overrideGlobalScenes) {
+                profile.scenes = scenes;
+                EditorUtility.SetDirty(profile);
+                AssetDatabase.SaveAssetIfDirty(profile);
+                return;
+            }
+#endif
+            EditorBuildSettings.scenes = scenes;
         }
     }
 }

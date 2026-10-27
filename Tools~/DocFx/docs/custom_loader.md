@@ -38,9 +38,9 @@ public class MyLoader : ISmartReferenceLoader
 
 ### Register the Loader
 ```csharp
-using SmartReference.Runtime;
+using SR = SmartReference.Runtime.SmartReference;
 
-SmartReference.InitWithCustomLoader(new MyLoader());
+SR.InitWithCustomLoader(new MyLoader());
 ```
 
 There are 4 functions to implement:

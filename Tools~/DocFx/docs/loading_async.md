@@ -80,9 +80,35 @@ This is the recommended async approach for gameplay code when UniTask is availab
 
 ---
 
+## With Awaitable
+On Unity 2023.2 or newer (including Unity 6), Smart Reference offers an API built on Unity's own `Awaitable<T>`. It is pooled and low-allocation like UniTask, and needs no extra package.
+
+```csharp
+using UnityEngine;
+using SmartReference.Runtime;
+
+public class AwaitableExample : MonoBehaviour
+{
+    [SerializeField] private SmartReference<GameObject> reference;
+
+    public async Awaitable Spawn()
+    {
+        var asset = await reference.LoadAsyncAwaitable(destroyCancellationToken);
+        Instantiate(asset);
+    }
+}
+```
+
+Unity pools `Awaitable` instances, so **an `Awaitable` must only be awaited once**. Await it right away or store the result, not the `Awaitable`. If you need to wait for the asset again, call `LoadAsyncAwaitable()` again. Callers that wait at the same time each get their own `Awaitable` but share one underlying load.
+
+Cancellation applies to each caller separately. Cancelling a token makes only that caller's `await` throw `OperationCanceledException`. The load and the other callers keep going. To stop the load itself, call `Release()`; every pending caller then receives `null`. Cancel tokens from the main thread.
+
+---
+
 ## Choosing an Async Style
 - Event callback: Simple, lightweight, no `async/await`
 - Task-based async: Integrates with standard .NET async flows
 - UniTask: Best performance and lowest allocation cost
+- Awaitable: Low allocation with no extra dependency (Unity 2023.2+)
 
 All async methods delegate to the active loader. Cancellation and release behavior depend on the loader implementation.
