@@ -1,5 +1,5 @@
 # Smart Reference
-#### version 2.0.0
+#### version 2.1.0
 
 [![DocFX Build and Publish](https://github.com/Brian-Jiang/SmartReference/actions/workflows/docfx-build-publish.yml/badge.svg?branch=main)](https://github.com/Brian-Jiang/SmartReference/actions/workflows/docfx-build-publish.yml)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Brian-Jiang/SmartReference?label=github&style=flat-square)](https://github.com/Brian-Jiang/SmartReference/releases)
