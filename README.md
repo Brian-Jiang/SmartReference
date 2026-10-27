@@ -36,21 +36,23 @@ public class MonsterData : ScriptableObject
 Choose the loader that matches your project setup.
 #### Addressables (recommended)
 ```csharp
-using SmartReference.Runtime;
+using SR = SmartReference.Runtime.SmartReference;
 
-SmartReference.InitWithAddressablesLoader();
+SR.InitWithAddressablesLoader();
 ```
 
 #### Resources
 ```csharp
-using SmartReference.Runtime;
+using SR = SmartReference.Runtime.SmartReference;
 
-SmartReference.InitWithResourcesLoader();
+SR.InitWithResourcesLoader();
 ```
 
 #### Custom Loader
 ```csharp
-SmartReference.InitWithCustomLoader(new MyCustomLoader());
+using SR = SmartReference.Runtime.SmartReference;
+
+SR.InitWithCustomLoader(new MyCustomLoader());
 ```
 
 Initialization must happen once, before any `SmartReference` is accessed.

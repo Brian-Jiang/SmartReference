@@ -5,15 +5,22 @@ During initialization, you need to register a loader implementation.
 Smart Reference will delegate all synchronous loads, asynchronous loads, releases, and cancellations to this loader.
 
 Initialization must happen before any `SmartReference` is used.
+
+The init methods are static methods of the `SmartReference.Runtime.SmartReference` class.
+```csharp
+using SR = SmartReference.Runtime.SmartReference;
+```
+You can also write the full name, `global::SmartReference.Runtime.SmartReference.InitWithAddressablesLoader();`.
+
 ---
 
 ## Init with Resources Loader
 Initializes Smart Reference using Unity’s built-in Resources system.
 
 ```csharp
-using SmartReference.Runtime;
+using SR = SmartReference.Runtime.SmartReference;
 
-SmartReference.InitWithResourcesLoader();
+SR.InitWithResourcesLoader();
 ```
 
 Use this option only when all referenced assets are located inside a Resources folder.
@@ -27,9 +34,9 @@ Because of this limitation, this loader is best suited for small projects, tools
 Initializes Smart Reference using Unity Addressables.
 
 ```csharp
-using SmartReference.Runtime;
+using SR = SmartReference.Runtime.SmartReference;
 
-SmartReference.InitWithAddressablesLoader();
+SR.InitWithAddressablesLoader();
 ```
 
 This option is only available if you have the [Addressables](https://docs.unity3d.com/Packages/com.unity.addressables@2.7/manual/index.html) package installed in your project.  
@@ -68,13 +75,14 @@ Because of this, initialize at `BeforeSceneLoad` or later, not from editor-only 
 ### Recommended: Runtime Initialization
 ```csharp
 using UnityEngine;
+using SR = SmartReference.Runtime.SmartReference;
 
 public static class SmartReferenceBootstrap
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void Init()
     {
-        SmartReference.InitWithAddressablesLoader();
+        SR.InitWithAddressablesLoader();
     }
 }
 ```
@@ -82,11 +90,14 @@ This ensures Smart Reference is ready before any scene or script attempts to loa
 
 ### Alternative: Bootstrap MonoBehaviour
 ```csharp
+using UnityEngine;
+using SR = SmartReference.Runtime.SmartReference;
+
 public class Bootstrap : MonoBehaviour
 {
     void Awake()
     {
-        SmartReference.InitWithAddressablesLoader();
+        SR.InitWithAddressablesLoader();
     }
 }
 ```
