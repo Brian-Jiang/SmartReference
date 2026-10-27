@@ -513,6 +513,81 @@ namespace SmartReference.Runtime.Tests
         }
 
         // ----------------------------
+        // 5a) Loader completes synchronously (StartCoroutine runs to its first yield immediately)
+        // ----------------------------
+
+        [Test]
+        public void AsyncLoad_Task_LoaderCompletesSynchronously_ReturnsAsset()
+        {
+            var stub = new StubLoader(delayFrames: 0);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new global::SmartReference.Runtime.SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            var t = r.LoadAsyncTask();
+
+            Assert.IsTrue(t.IsCompleted);
+            Assert.NotNull(t.Result);
+            Assert.IsTrue(r.IsLoaded);
+            Assert.IsFalse(r.IsLoading);
+
+            r.Release();
+            Assert.AreSame(stub.LastAsyncHandle, stub.LastReleasedHandle);
+        }
+
+        [Test]
+        public void AsyncLoad_LoaderCompletesSynchronouslyWithWrongType_ReleasesRealHandle()
+        {
+            var stub = new StubLoader(delayFrames: 0);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new global::SmartReference.Runtime.SmartReference<Texture2D> { path = "stub://tex" };
+
+            LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex(@"\[SmartReference\] Loaded asset at path: stub://tex is .*SmartReferenceTestSO, expected UnityEngine\.Texture2D"));
+            var t = r.LoadAsyncTask();
+
+            Assert.IsTrue(t.IsCompleted);
+            Assert.IsNull(t.Result);
+            Assert.AreEqual(1, stub.ReleaseCalls);
+            Assert.NotNull(stub.LastReleasedHandle);
+            Assert.AreSame(stub.LastAsyncHandle, stub.LastReleasedHandle);
+
+            // Nothing is left to release
+            r.Release();
+            Assert.AreEqual(1, stub.ReleaseCalls);
+        }
+
+#if SMARTREFERENCE_UNITASK_SUPPORT
+        [UnityTest]
+        public IEnumerator AsyncLoad_UniTask_LoaderCompletesSynchronously_ReturnsAsset()
+        {
+            var stub = new StubLoader(delayFrames: 0);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+
+            yield return r.LoadAsyncUniTask().ToCoroutine(result => Assert.NotNull(result));
+            Assert.IsTrue(r.IsLoaded);
+        }
+#endif
+
+#if UNITY_2023_2_OR_NEWER
+        [UnityTest]
+        public IEnumerator AsyncLoad_Awaitable_LoaderCompletesSynchronously_ReturnsAsset()
+        {
+            var stub = new StubLoader(delayFrames: 0);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+
+            var task = AsTask(r.LoadAsyncAwaitable());
+            yield return WaitForTask(task);
+
+            Assert.NotNull(task.Result);
+            Assert.IsTrue(r.IsLoaded);
+        }
+#endif
+
+        // ----------------------------
         // 5b) Resources release
         // ----------------------------
 
@@ -721,6 +796,8 @@ namespace SmartReference.Runtime.Tests
             public int AsyncLoadCalls { get; private set; }
             public int ReleaseCalls { get; private set; }
             public int CancelCalls { get; private set; }
+            public ISmartReferenceHandle LastAsyncHandle { get; private set; }
+            public ISmartReferenceHandle LastReleasedHandle { get; private set; }
 
             public StubLoader(int delayFrames, bool honorCancel = true)
             {
@@ -739,6 +816,7 @@ namespace SmartReference.Runtime.Tests
             {
                 AsyncLoadCalls++;
                 var h = new H();
+                LastAsyncHandle = h;
                 CoroutineRunner.Ensure().StartCoroutine(DelayedComplete(h, type, onComplete));
                 return h;
             }
@@ -746,6 +824,7 @@ namespace SmartReference.Runtime.Tests
             public void Release(global::SmartReference.Runtime.ISmartReferenceHandle handle)
             {
                 ReleaseCalls++;
+                LastReleasedHandle = handle;
                 // In a real loader, you'd release handle/asset (Addressables.Release, etc.)
             }
 

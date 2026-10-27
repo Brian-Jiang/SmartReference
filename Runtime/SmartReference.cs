@@ -234,7 +234,29 @@ namespace SmartReference.Runtime
             isLoading = true;
             releaseRequested = false;
             var loadSession = Session;
-            handle = Loader.LoadAsync(path, typeof(T), obj => OnAsyncLoadCompleteCallback(obj, loadSession));
+
+            // A loader may complete synchronously, before its handle is returned. Defer the callback until
+            // handle is assigned, so a release on that path releases the real handle.
+            var returned = false;
+            var completedSynchronously = false;
+            Object syncResult = null;
+            handle = Loader.LoadAsync(path, typeof(T), obj =>
+            {
+                if (!returned)
+                {
+                    completedSynchronously = true;
+                    syncResult = obj;
+                    return;
+                }
+
+                OnAsyncLoadCompleteCallback(obj, loadSession);
+            });
+            returned = true;
+
+            if (completedSynchronously)
+            {
+                OnAsyncLoadCompleteCallback(syncResult, loadSession);
+            }
         }
         
         /// <summary>
@@ -266,9 +288,10 @@ namespace SmartReference.Runtime
                 return inFlightTaskTcs.Task;
             }
 
-            inFlightTaskTcs = new TaskCompletionSource<T>();
+            var tcs = new TaskCompletionSource<T>();
+            inFlightTaskTcs = tcs;
             LoadAsync();
-            return inFlightTaskTcs.Task;
+            return tcs.Task;
         }
         
 #if SMARTREFERENCE_UNITASK_SUPPORT
@@ -310,9 +333,10 @@ namespace SmartReference.Runtime
                 return inFlightUniTaskTcs.Task.AttachExternalCancellation(cancellationToken);
             }
 
-            inFlightUniTaskTcs = new UniTaskCompletionSource<T>();
+            var utcs = new UniTaskCompletionSource<T>();
+            inFlightUniTaskTcs = utcs;
             LoadAsync();
-            return inFlightUniTaskTcs.Task.AttachExternalCancellation(cancellationToken);
+            return utcs.Task.AttachExternalCancellation(cancellationToken);
         }
 
 #endif
