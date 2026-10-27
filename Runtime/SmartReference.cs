@@ -114,6 +114,8 @@ namespace SmartReference.Runtime
 
         [NonSerialized] private ISmartReferenceHandle handle;
         [NonSerialized] private bool releaseRequested;
+        // Loader.Cancel was called on the in-flight load. It stays set when a new load request clears releaseRequested.
+        [NonSerialized] private bool cancelIssued;
 #if UNITY_EDITOR
         [NonSerialized] private int session;
 #endif
@@ -228,11 +230,16 @@ namespace SmartReference.Runtime
                 return;
             }
 
-            // If already loading, do nothing
-            if (isLoading) return;
+            // If already loading, keep the in-flight load.
+            if (isLoading)
+            {
+                releaseRequested = false;
+                return;
+            }
 
             isLoading = true;
             releaseRequested = false;
+            cancelIssued = false;
             var loadSession = Session;
 
             // A loader may complete synchronously, before its handle is returned. Defer the callback until
@@ -285,7 +292,10 @@ namespace SmartReference.Runtime
 
             if (inFlightTaskTcs != null)
             {
-                return inFlightTaskTcs.Task;
+                // Still call LoadAsync, so a release requested during the load is overridden
+                var inFlightTask = inFlightTaskTcs.Task;
+                LoadAsync();
+                return inFlightTask;
             }
 
             var tcs = new TaskCompletionSource<T>();
@@ -330,7 +340,10 @@ namespace SmartReference.Runtime
 
             if (inFlightUniTaskTcs != null)
             {
-                return inFlightUniTaskTcs.Task.AttachExternalCancellation(cancellationToken);
+                // Still call LoadAsync, so a release requested during the load is overridden
+                var inFlightTask = inFlightUniTaskTcs.Task;
+                LoadAsync();
+                return inFlightTask.AttachExternalCancellation(cancellationToken);
             }
 
             var utcs = new UniTaskCompletionSource<T>();
@@ -493,6 +506,7 @@ namespace SmartReference.Runtime
             if (isLoading)
             {
                 releaseRequested = true;
+                cancelIssued = true;
                 try
                 {
                     Loader.Cancel(handle);
@@ -580,6 +594,7 @@ namespace SmartReference.Runtime
             handle = null;
             isLoading = false;
             releaseRequested = false;
+            cancelIssued = false;
             inFlightTaskTcs = null;
 #if SMARTREFERENCE_UNITASK_SUPPORT
             inFlightUniTaskTcs = null;
@@ -602,6 +617,7 @@ namespace SmartReference.Runtime
             if (releaseRequested)
             {
                 releaseRequested = false;
+                cancelIssued = false;
                 if (obj != null)
                 {
                     ReleaseHandle();
@@ -610,6 +626,18 @@ namespace SmartReference.Runtime
                 handle = null;
                 CompleteInFlight(null);
                 return;
+            }
+
+            // Released and then requested again during loading.
+            if (cancelIssued)
+            {
+                cancelIssued = false;
+                if (obj == null)
+                {
+                    handle = null;
+                    LoadAsync();
+                    return;
+                }
             }
 
             if (obj == null)

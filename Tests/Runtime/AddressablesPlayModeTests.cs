@@ -60,6 +60,27 @@ namespace SmartReference.Runtime.Tests
             Assert.IsFalse(r.IsLoading);
             LogAssert.NoUnexpectedReceived();
         }
+
+        [UnityTest]
+        public IEnumerator Release_ThenLoadAgain_DuringAsyncLoad_DeliversAsset()
+        {
+            var r = new SmartReference<GameObject> { path = AddressablesTestSetup.PrefabPath };
+            var task = r.LoadAsyncTask();
+            Assert.IsTrue(r.IsLoading);
+
+            r.Release();
+            var reloadTask = r.LoadAsyncTask();
+            while (!reloadTask.IsCompleted) yield return null;
+
+            Assert.NotNull(task.Result);
+            Assert.NotNull(reloadTask.Result);
+            Assert.IsTrue(r.IsLoaded);
+            Assert.IsFalse(r.IsLoading);
+
+            r.Release();
+            Assert.IsFalse(r.IsLoaded);
+            LogAssert.NoUnexpectedReceived();
+        }
     }
 
     /// <summary>

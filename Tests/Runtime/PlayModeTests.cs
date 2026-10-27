@@ -481,6 +481,76 @@ namespace SmartReference.Runtime.Tests
         }
 
         [UnityTest]
+        public IEnumerator Release_ThenLoadAgain_DuringLoading_LoaderHonorsCancel_StartsNewLoad()
+        {
+            var stub = new StubLoader(delayFrames: 2);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new global::SmartReference.Runtime.SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            var completeEvents = 0;
+            r.OnAsyncLoadComplete += _ => completeEvents++;
+
+            // e.g. a UI opens, closes and reopens within one load
+            var t1 = r.LoadAsyncTask();
+            r.Release();
+            var t2 = r.LoadAsyncTask();
+            Assert.IsFalse(r.ReleaseRequested);
+            Assert.AreSame(t1, t2);
+
+            yield return WaitForTask(t2);
+
+            Assert.NotNull(t2.Result);
+            Assert.IsTrue(r.IsLoaded);
+            Assert.IsFalse(r.IsLoading);
+            Assert.AreEqual(1, completeEvents);
+            Assert.AreEqual(2, stub.AsyncLoadCalls);
+            Assert.AreEqual(0, stub.ReleaseCalls);
+            LogAssert.NoUnexpectedReceived();
+
+            r.Release();
+            Assert.AreSame(stub.LastAsyncHandle, stub.LastReleasedHandle);
+        }
+
+        [UnityTest]
+        public IEnumerator Release_ThenLoadAgain_DuringLoading_LoaderIgnoresCancel_KeepsAsset()
+        {
+            var stub = new StubLoader(delayFrames: 2, honorCancel: false);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new global::SmartReference.Runtime.SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            r.LoadAsync();
+            r.Release();
+            var t = r.LoadAsyncTask();
+
+            yield return WaitForTask(t);
+
+            Assert.NotNull(t.Result);
+            Assert.IsTrue(r.IsLoaded);
+            Assert.AreEqual(1, stub.AsyncLoadCalls);
+            Assert.AreEqual(0, stub.ReleaseCalls);
+        }
+
+        [UnityTest]
+        public IEnumerator Release_ThenLoadThenRelease_DuringLoading_CallersGetNull()
+        {
+            var stub = new StubLoader(delayFrames: 2);
+            global::SmartReference.Runtime.SmartReference.InitWithCustomLoader(stub);
+
+            var r = new global::SmartReference.Runtime.SmartReference<SmartReferenceTestSO> { path = "stub://so" };
+            var t = r.LoadAsyncTask();
+            r.Release();
+            r.LoadAsync();
+            r.Release();
+
+            yield return WaitForTask(t);
+
+            Assert.IsNull(t.Result);
+            Assert.IsFalse(r.IsLoaded);
+            Assert.IsFalse(r.IsLoading);
+            Assert.AreEqual(1, stub.AsyncLoadCalls);
+        }
+
+        [UnityTest]
         public IEnumerator AsyncLoad_HandlerAddedBeforeFirstLoad_IsInvoked()
         {
             var stub = new StubLoader(delayFrames: 1);
