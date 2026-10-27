@@ -20,7 +20,7 @@ public class SyncLoadExample : MonoBehaviour
     {
         var texture = icon.Value;
 
-        var instance = Instantiate(prefab);
+        var instance = Instantiate(prefab.Value);
     }
 }
 ```
